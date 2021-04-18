@@ -1,4 +1,4 @@
-module github.com/bool64/go-library-template
+module github.com/bool64/brick
 
 go 1.16
 
