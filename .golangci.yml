@@ -30,6 +30,8 @@ linters:
     - exhaustivestruct
     - interfacer
     - forcetypeassert
+    - ifshort
+    - scopelint
 
 issues:
   exclude-use-default: false
