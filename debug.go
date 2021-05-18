@@ -18,10 +18,10 @@ import (
 func MountDevPortal(r chi.Router, l *BaseLocator, options ...func(options *debug.RouterConfig)) {
 	cfg := l.BaseConfig
 
-	if cfg.Debug.TraceUrl != "" {
+	if cfg.Debug.TraceURL != "" {
 		options = append(options, func(options *debug.RouterConfig) {
 			options.TraceToURL = func(traceID string) string {
-				return strings.ReplaceAll(cfg.Debug.TraceUrl, "{trace_id}", traceID)
+				return strings.ReplaceAll(cfg.Debug.TraceURL, "{trace_id}", traceID)
 			}
 		})
 	}
@@ -70,7 +70,7 @@ func DebugHandler(l *BaseLocator, options ...func(options *debug.RouterConfig)) 
 		cfg.Links["docs"] = "API Docs"
 		cfg.Routes = append(cfg.Routes, func(r *chi.Mux) {
 			r.Method(http.MethodGet, "/docs/openapi.json", l.OpenAPI)
-			r.Mount("/docs", v3.NewHandler(l.OpenAPI.Reflector().Spec.Info.Title,
+			r.Mount("/docs", v3.NewHandler(l.OpenAPI.Reflector().SpecEns().Info.Title,
 				cfg.Prefix+"/docs/openapi.json", cfg.Prefix+"/docs"))
 		})
 	}

@@ -7,8 +7,8 @@ type Config struct {
 	// TraceSamplingProbability is probability of exporting of OpenCensus trace.
 	TraceSamplingProbability float64 `split_words:"true" default:"0.1"`
 
-	// TraceUrl allows providing URL to {trace_id}, example http://jaeger.myservice.com/trace/{trace_id}.
-	TraceUrl string `split_words:"true"`
+	// TraceURL allows providing URL to {trace_id}, example http://jaeger.myservice.com/trace/{trace_id}.
+	TraceURL string `split_words:"true"`
 
 	// DevTools enables developer tools for documentation and debug.
 	DevTools bool `split_words:"true" default:"true"`

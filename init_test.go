@@ -55,8 +55,6 @@ func TestNewBaseLocator(t *testing.T) {
 	r := brick.NewBaseRouter(l)
 	serviceURLPrefix := "/" + cfg.ServiceName
 
-	brick.MountDevPortal(r, l)
-
 	uc := usecase.NewIOI(nil, nil, func(ctx context.Context, input, output interface{}) error {
 		panic("oops")
 	})
