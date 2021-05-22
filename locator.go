@@ -21,7 +21,7 @@ type BaseLocator struct {
 
 	UseCaseMiddlewares []usecase.Middleware
 
-	OpenAPI               *openapi.Collector
 	HTTPRequestDecoder    *request.DecoderFactory
 	HTTPServerMiddlewares []func(h http.Handler) http.Handler
+	OpenAPI               *openapi.Collector
 }
