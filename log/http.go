@@ -21,8 +21,8 @@ func HTTPTraceTransaction(fields ctxd.FieldNames) func(h http.Handler) http.Hand
 			if span := trace.FromContext(r.Context()); span != nil {
 				sc := span.SpanContext()
 				ctx := ctxd.AddFields(r.Context(),
-					fields.TraceID, sc.TraceID,
-					fields.TransactionID, sc.SpanID,
+					fields.TraceID, sc.TraceID.String(),
+					fields.TransactionID, sc.SpanID.String(),
 				)
 				r = r.WithContext(ctx)
 			}
