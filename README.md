@@ -1,4 +1,4 @@
-# brick
+# 🧱 brick
 
 <img align="right" width="250px" src="https://i.pinimg.com/736x/bd/97/01/bd9701a8c1f449bcf5d51ddf852fcb38.jpg">
 
