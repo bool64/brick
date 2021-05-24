@@ -5,8 +5,10 @@ go 1.16
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/prometheus v0.3.0
+	contrib.go.opencensus.io/integrations/ocsql v0.1.7
 	github.com/bool64/ctxd v0.1.5
-	github.com/bool64/dev v0.1.30
+	github.com/bool64/dbwrap v0.1.2
+	github.com/bool64/dev v0.1.32
 	github.com/bool64/logz v0.1.7
 	github.com/bool64/prom-stats v0.1.2
 	github.com/bool64/stats v0.2.1
@@ -21,6 +23,5 @@ require (
 	github.com/swaggest/swgui v1.2.3
 	github.com/swaggest/usecase v0.1.5
 	go.opencensus.io v0.23.0
-	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.16.0
 )
