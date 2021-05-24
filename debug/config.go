@@ -22,8 +22,9 @@ type Config struct {
 	// URL used as an entry point to mount dev tools debug router.
 	URL string `split_words:"true" default:"/debug"`
 
-	// ExposePanics allows showing panic messages and traces in API response.
-	ExposePanics bool `split_words:"true"`
+	// ExposePanic allows showing panic messages and traces in API response,
+	// can be useful for non-production environments.
+	ExposePanic bool `split_words:"true"`
 
 	OnPanic []func(ctx context.Context, rcv interface{}, stack []byte) `ignored:"true"`
 }
