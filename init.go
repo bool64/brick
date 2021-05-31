@@ -53,10 +53,6 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		MaxSamples:     50,
 	})
 
-	if err := setupPrometheus(l); err != nil {
-		return nil, err
-	}
-
 	l.HTTPRequestDecoder = request.NewDecoderFactory()
 
 	l.UseCaseMiddlewares = []usecase.Middleware{
@@ -75,8 +71,10 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 
 	l.HTTPServerMiddlewares = append(l.HTTPServerMiddlewares,
 		log.HTTPRecover{
-			Logger:     l.CtxdLogger(),
-			FieldNames: l.BaseConfig.Log.FieldNames,
+			Logger:      l.CtxdLogger(),
+			FieldNames:  l.BaseConfig.Log.FieldNames,
+			PrintPanic:  cfg.Log.DevMode,
+			ExposePanic: cfg.Debug.ExposePanic,
 		}.Middleware(), // Panic recovery and request logging.
 		opencensus.Middleware, // Tracing.
 		log.HTTPTraceTransaction(l.BaseConfig.Log.FieldNames), // Trace transaction.
@@ -85,6 +83,10 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		request.ValidatorMiddleware(validatorFactory),         // Request validator setup.
 		response.EncoderMiddleware,                            // Response encoder setup.
 	)
+
+	if err := setupPrometheus(l); err != nil {
+		return l, err
+	}
 
 	return l, nil
 }
@@ -100,8 +102,7 @@ func setupPrometheus(l *BaseLocator) error {
 		return err
 	}
 
-	err := view.Register(opencensus.Views()...)
-	if err != nil {
+	if err := view.Register(opencensus.Views()...); err != nil {
 		return err
 	}
 
