@@ -22,10 +22,10 @@ require (
 	github.com/prometheus/client_golang v1.10.0
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggest/assertjson v1.6.4
-	github.com/swaggest/rest v0.2.4
+	github.com/swaggest/rest v0.2.5
 	github.com/swaggest/swgui v1.2.3
 	github.com/swaggest/usecase v0.1.5
 	github.com/vearutop/gooselite v0.1.1
 	go.opencensus.io v0.23.0
-	go.uber.org/zap v1.16.0
+	go.uber.org/zap v1.17.0
 )
