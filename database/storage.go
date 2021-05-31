@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"strings"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/bool64/ctxd"
@@ -72,6 +73,11 @@ func (l gooseLogger) Fatalf(f string, v ...interface{}) {
 	l.l.Error(l.c, fmt.Sprintf(f, v...))
 	os.Exit(1)
 }
-func (l gooseLogger) Print(v ...interface{})            { l.l.Info(l.c, fmt.Sprint(v...)) }
-func (l gooseLogger) Println(v ...interface{})          { l.l.Info(l.c, fmt.Sprintln(v...)) }
-func (l gooseLogger) Printf(f string, v ...interface{}) { l.l.Info(l.c, fmt.Sprintf(f, v...)) }
+
+func (l gooseLogger) Print(v ...interface{}) {
+	l.l.Info(l.c, strings.TrimRight(fmt.Sprint(v...), "\n"))
+}
+func (l gooseLogger) Println(v ...interface{}) { l.l.Info(l.c, fmt.Sprint(v...)) }
+func (l gooseLogger) Printf(f string, v ...interface{}) {
+	l.l.Info(l.c, strings.TrimRight(fmt.Sprintf(f, v...), "\n"))
+}

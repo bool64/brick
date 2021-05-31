@@ -53,10 +53,6 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		MaxSamples:     50,
 	})
 
-	if err := setupPrometheus(l); err != nil {
-		return nil, err
-	}
-
 	l.HTTPRequestDecoder = request.NewDecoderFactory()
 
 	l.UseCaseMiddlewares = []usecase.Middleware{
@@ -88,6 +84,10 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		response.EncoderMiddleware,                            // Response encoder setup.
 	)
 
+	if err := setupPrometheus(l); err != nil {
+		return l, err
+	}
+
 	return l, nil
 }
 
@@ -102,8 +102,7 @@ func setupPrometheus(l *BaseLocator) error {
 		return err
 	}
 
-	err := view.Register(opencensus.Views()...)
-	if err != nil {
+	if err := view.Register(opencensus.Views()...); err != nil {
 		return err
 	}
 
