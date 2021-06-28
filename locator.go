@@ -3,8 +3,10 @@ package brick
 import (
 	"net/http"
 
+	"github.com/bool64/brick/debug"
 	"github.com/bool64/brick/graceful"
 	"github.com/bool64/ctxd"
+	"github.com/bool64/sqluct"
 	"github.com/bool64/stats"
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/request"
@@ -18,10 +20,13 @@ type BaseLocator struct {
 	ctxd.LoggerProvider
 	stats.TrackerProvider
 	*graceful.Switch
+	DebugRouter *debug.Mux
 
 	UseCaseMiddlewares []usecase.Middleware
 
 	HTTPRequestDecoder    *request.DecoderFactory
 	HTTPServerMiddlewares []func(h http.Handler) http.Handler
 	OpenAPI               *openapi.Collector
+
+	Storage *sqluct.Storage
 }

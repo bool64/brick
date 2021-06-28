@@ -26,3 +26,13 @@ type BaseConfig struct {
 	// Debug controls dev tools.
 	Debug debug.Config `split_words:"true"`
 }
+
+// WithBaseConfig is an embedded config accessor.
+type WithBaseConfig interface {
+	Base() BaseConfig
+}
+
+// Base exposes base config.
+func (c *BaseConfig) Base() BaseConfig {
+	return *c
+}
