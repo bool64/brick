@@ -13,9 +13,6 @@ type Config struct {
 	// DevTools enables developer tools for documentation and debug.
 	DevTools bool `split_words:"true" default:"true"`
 
-	// RouterConfig allows control of developer tools router.
-	RouterConfig []func(options *RouterConfig) `ignored:"true"`
-
 	// DevPassword enables password protection for dev tools.
 	DevPassword string `split_words:"true"`
 

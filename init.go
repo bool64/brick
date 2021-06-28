@@ -15,6 +15,7 @@ import (
 	"github.com/bool64/stats"
 	"github.com/bool64/zapctxd"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/swaggest/rest/jsonschema"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/openapi"
@@ -66,7 +67,7 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		})
 	}
 
-	// Setup request decoder and validator.
+	// Init request decoder and validator.
 	validatorFactory := jsonschema.NewFactory(l.OpenAPI, l.OpenAPI)
 
 	l.HTTPServerMiddlewares = append(l.HTTPServerMiddlewares,
@@ -94,11 +95,11 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 func setupPrometheus(l *BaseLocator) error {
 	promReg := prometheus.NewRegistry()
 
-	if err := promReg.Register(prometheus.NewGoCollector()); err != nil {
+	if err := promReg.Register(collectors.NewGoCollector()); err != nil {
 		return err
 	}
 
-	if err := promReg.Register(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{})); err != nil {
+	if err := promReg.Register(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{})); err != nil {
 		return err
 	}
 
