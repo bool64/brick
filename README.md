@@ -11,4 +11,6 @@
 
 Brick is a minimalistic opinionated web service unit suitable for microservice development.
 
+Create a new app from [brick-starter-kit](https://github.com/bool64/brick-starter-kit/).
+
 WORK IN PROGRESS
