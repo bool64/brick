@@ -34,6 +34,10 @@ func MountDevPortal(r chi.Router, l *BaseLocator) {
 
 // SetupDebugRouter initializes a router with debug tools.
 func (l *BaseLocator) SetupDebugRouter() {
+	if l.DebugRouter != nil {
+		return
+	}
+
 	cfg := l.BaseConfig
 
 	prefix := cfg.Debug.URL

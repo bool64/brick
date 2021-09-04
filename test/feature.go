@@ -1,14 +1,16 @@
-package brick
+package test
 
 import (
-	"bytes"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
 
+	"github.com/bool64/brick"
 	"github.com/bool64/brick/config"
 	"github.com/bool64/dbdog"
+	"github.com/bool64/godogx"
+	"github.com/bool64/godogx/allure"
 	"github.com/bool64/httpdog"
 	"github.com/bool64/shared"
 	"github.com/cucumber/godog"
@@ -16,8 +18,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestContext is a test context for feature tests.
-type TestContext struct {
+// Context is a test context for feature tests.
+type Context struct {
 	Vars                *shared.Vars
 	Local               *httpdog.Local
 	External            *httpdog.External
@@ -25,12 +27,12 @@ type TestContext struct {
 	ScenarioInitializer func(s *godog.ScenarioContext)
 }
 
-func newTestContext(t *testing.T) *TestContext {
+func newContext(t *testing.T) *Context {
 	t.Helper()
 
 	vars := &shared.Vars{}
 
-	tc := &TestContext{}
+	tc := &Context{}
 	tc.Local = httpdog.NewLocal("")
 	tc.Local.JSONComparer.Vars = vars
 	tc.Local.Client.OnBodyMismatch = func(data []byte) {
@@ -46,8 +48,8 @@ func newTestContext(t *testing.T) *TestContext {
 	return tc
 }
 
-// RunTests runs feature tests.
-func RunTests(t *testing.T, envPrefix string, cfg WithBaseConfig, init func(tc *TestContext) (*BaseLocator, http.Handler)) {
+// RunFeatures runs feature tests.
+func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init func(tc *Context) (*brick.BaseLocator, http.Handler)) {
 	t.Helper()
 
 	if testing.Short() {
@@ -56,7 +58,7 @@ func RunTests(t *testing.T, envPrefix string, cfg WithBaseConfig, init func(tc *
 
 	require.NoError(t, config.Load(envPrefix, cfg, config.WithOptionalEnvFiles(".env.integration-test")))
 
-	tc := newTestContext(t)
+	tc := newContext(t)
 	l, router := init(tc)
 
 	addr, err := l.StartHTTPServer(router)
@@ -68,19 +70,11 @@ func RunTests(t *testing.T, envPrefix string, cfg WithBaseConfig, init func(tc *
 	dbi.Storage = l.Storage
 	tc.Database.Instances[dbdog.DefaultDatabase] = dbi
 
-	output := bytes.NewBuffer(nil)
-	suite := godog.TestSuite{
-		ScenarioInitializer: func(s *godog.ScenarioContext) {
-			output.Reset()
-			s.AfterScenario(func(sc *godog.Scenario, err error) {
-				if err != nil {
-					t.Helper()
-					t.Run(sc.GetName(), func(t *testing.T) {
-						t.Fatal(output.String())
-					})
-				}
-			})
+	godogx.RegisterPrettyFailedFormatter()
 
+	suite := godog.TestSuite{
+		Name: cfg.Base().ServiceName + "-integration-test",
+		ScenarioInitializer: func(s *godog.ScenarioContext) {
 			tc.Local.RegisterSteps(s)
 			tc.External.RegisterSteps(s)
 			tc.Database.RegisterSteps(s)
@@ -90,18 +84,29 @@ func RunTests(t *testing.T, envPrefix string, cfg WithBaseConfig, init func(tc *
 			}
 		},
 		Options: &godog.Options{
-			Format:        "pretty",
-			Output:        output,
+			Format:        "pretty-failed",
 			Strict:        true,
-			Concurrency:   1,
 			Paths:         []string{"features"},
 			Tags:          os.Getenv("GODOG_TAGS"),
 			StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
+			TestingT:      t,
 		},
 	}
 
-	suite.Run()
+	if os.Getenv("GODOG_ALLURE") != "" {
+		allure.RegisterFormatter()
 
-	l.Shutdown()
+		suite.Options.Format += ",allure"
+	}
+
+	assert.Equal(t, 0, suite.Run(), "non-zero status returned, failed to run feature tests")
+
+	// An instance can keep on running if developer would like to use or debug it after tests have finished.
+	if os.Getenv("GODOG_KEEP_INSTANCE") == "1" {
+		println("tests passed, keeping instance, kill it manually at will")
+	} else {
+		l.Shutdown()
+	}
+
 	<-l.Wait()
 }
