@@ -46,6 +46,8 @@ func (l *BaseLocator) SetupDebugRouter() {
 	dr.AddLink("version", "Version")
 	dr.Get("/version", version.Handler)
 
+	dr.AddLink("zpages/tracez", "Trace Spans")
+
 	if cfg.Debug.TraceURL != "" {
 		dr.Mount("/zpages", zpages.Mux(prefix+"/zpages", func(traceID string) string {
 			return strings.ReplaceAll(cfg.Debug.TraceURL, "{trace_id}", traceID)
