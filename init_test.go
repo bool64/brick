@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bool64/brick"
-	"github.com/bool64/brick/config"
+	brick "github.com/acme-corp-tech/brick"
+	"github.com/acme-corp-tech/brick/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

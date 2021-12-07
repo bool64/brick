@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bool64/brick/config"
+	"github.com/acme-corp-tech/brick/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

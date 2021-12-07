@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bool64/brick"
-	"github.com/bool64/brick/config"
+	brick "github.com/acme-corp-tech/brick"
+	"github.com/acme-corp-tech/brick/config"
 	"github.com/bool64/dbdog"
 	"github.com/bool64/godogx"
 	"github.com/bool64/godogx/allure"

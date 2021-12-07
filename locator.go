@@ -3,8 +3,8 @@ package brick
 import (
 	"net/http"
 
-	"github.com/bool64/brick/debug"
-	"github.com/bool64/brick/graceful"
+	"github.com/acme-corp-tech/brick/debug"
+	"github.com/acme-corp-tech/brick/graceful"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/sqluct"
 	"github.com/bool64/stats"

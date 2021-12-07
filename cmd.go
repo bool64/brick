@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bool64/brick/config"
+	"github.com/acme-corp-tech/brick/config"
 	"github.com/bool64/dev/version"
 	"github.com/swaggest/assertjson"
 )

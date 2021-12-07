@@ -3,7 +3,7 @@ package runtime_test
 import (
 	"testing"
 
-	"github.com/bool64/brick/runtime"
+	"github.com/acme-corp-tech/brick/runtime"
 	"github.com/stretchr/testify/assert"
 )
 

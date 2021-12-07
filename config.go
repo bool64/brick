@@ -3,7 +3,7 @@ package brick
 import (
 	"time"
 
-	"github.com/bool64/brick/debug"
+	"github.com/acme-corp-tech/brick/debug"
 	"github.com/bool64/zapctxd"
 )
 

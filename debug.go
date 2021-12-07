@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bool64/brick/debug"
-	"github.com/bool64/brick/debug/zpages"
+	"github.com/acme-corp-tech/brick/debug"
+	"github.com/acme-corp-tech/brick/debug/zpages"
 	"github.com/bool64/dev/version"
 	"github.com/bool64/logz/ctxz"
 	"github.com/bool64/logz/logzpage"

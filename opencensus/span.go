@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/bool64/brick/runtime"
+	"github.com/acme-corp-tech/brick/runtime"
 	"github.com/swaggest/usecase/status"
 	"go.opencensus.io/trace"
 )

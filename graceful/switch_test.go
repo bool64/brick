@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bool64/brick/graceful"
+	"github.com/acme-corp-tech/brick/graceful"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
