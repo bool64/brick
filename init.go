@@ -47,6 +47,11 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 	l := NoOpLocator()
 
 	l.BaseConfig = cfg
+
+	if !cfg.Initialized {
+		return l, nil
+	}
+
 	l.Switch = graceful.NewSwitch(cfg.ShutdownTimeout)
 
 	l.LoggerProvider = ctxz.NewObserver(zapctxd.New(cfg.Log).SkipCaller(), logz.Config{

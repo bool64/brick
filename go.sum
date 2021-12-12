@@ -95,10 +95,8 @@ github.com/bool64/dev v0.1.33/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2z
 github.com/bool64/dev v0.1.35/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2zRWU=
 github.com/bool64/dev v0.1.37/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2zRWU=
 github.com/bool64/dev v0.1.38/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2zRWU=
-github.com/bool64/dev v0.1.41 h1:L554LCQZc3d7mtcdPUgDbSrCVbr48/30zgu0VuC/FTA=
-github.com/bool64/dev v0.1.41/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2zRWU=
-github.com/bool64/dev v0.1.43 h1:McAhPS6dBrNSN53K9+4dj4ntCjEf9pw/r8AwaXRKgX8=
-github.com/bool64/dev v0.1.43/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2zRWU=
+github.com/bool64/dev v0.2.1 h1:BUyUOyYCHhDG136z0T8jNMgF4rs6rmqpJ5gC0oYN6NI=
+github.com/bool64/dev v0.2.1/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2zRWU=
 github.com/bool64/godogx v0.1.1 h1:iAwnix6HQgl7A5BAJ4mMvWbhR721GHNxeAAKFEjrWO4=
 github.com/bool64/godogx v0.1.1/go.mod h1:qydmzRfimgYTmNEvpnc+SJNkmdjpPoPavYQoSn2rjoY=
 github.com/bool64/httpdog v0.1.10 h1:Z4XhyckYRJxj8Tn2+gfI6MclBCaZr3eAQWodcUmsnCY=
