@@ -9,6 +9,9 @@ import (
 
 // BaseConfig is a basic application agnostic service configuration that manages common infrastructure.
 type BaseConfig struct {
+	// Initialized indicates zero/uninitialized value of the configuration.
+	Initialized bool `default:"true"`
+
 	Log zapctxd.Config `split_words:"true"`
 
 	// Environment is the name of environment where application runs.
