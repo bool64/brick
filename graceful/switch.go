@@ -122,6 +122,10 @@ func (s *Switch) OnShutdown(name string, fn func()) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.tasks == nil {
+		s.tasks = make(map[string]func())
+	}
+
 	s.tasks[name] = fn
 }
 
