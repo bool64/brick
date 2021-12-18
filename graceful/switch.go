@@ -123,7 +123,7 @@ func (s *Switch) OnShutdown(name string, fn func()) {
 	defer s.mu.Unlock()
 
 	if s.tasks == nil {
-		s.tasks = make(map[string]func())
+		panic("graceful: Switch is not initialized, did you call NewSwitch?")
 	}
 
 	s.tasks[name] = fn
