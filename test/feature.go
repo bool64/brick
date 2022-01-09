@@ -26,6 +26,7 @@ type Context struct {
 	External            *httpsteps.ExternalServer
 	Database            *dbdog.Manager
 	ScenarioInitializer func(s *godog.ScenarioContext)
+	Concurrency         int
 }
 
 func newContext(t *testing.T) *Context {
@@ -92,6 +93,7 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 			Tags:          os.Getenv("GODOG_TAGS"),
 			StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
 			TestingT:      t,
+			Concurrency:   tc.Concurrency,
 		},
 	}
 
