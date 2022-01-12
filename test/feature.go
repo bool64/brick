@@ -8,12 +8,12 @@ import (
 
 	"github.com/bool64/brick"
 	"github.com/bool64/brick/config"
-	"github.com/bool64/dbdog"
 	"github.com/bool64/godogx"
 	"github.com/bool64/godogx/allure"
 	"github.com/bool64/httpmock"
 	"github.com/bool64/shared"
 	"github.com/cucumber/godog"
+	"github.com/godogx/dbsteps"
 	"github.com/godogx/httpsteps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,7 +24,7 @@ type Context struct {
 	Vars                *shared.Vars
 	Local               *httpsteps.LocalClient
 	External            *httpsteps.ExternalServer
-	Database            *dbdog.Manager
+	Database            *dbsteps.Manager
 	ScenarioInitializer func(s *godog.ScenarioContext)
 	Concurrency         int
 }
@@ -45,7 +45,7 @@ func newContext(t *testing.T) *Context {
 	tc.External = httpsteps.NewExternalServer()
 	tc.External.Vars = vars
 
-	tc.Database = dbdog.NewManager()
+	tc.Database = dbsteps.NewManager()
 	tc.Database.Vars = vars
 
 	return tc
@@ -69,9 +69,9 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 
 	require.NoError(t, tc.Local.SetBaseURL(addr, httpsteps.Default))
 
-	dbi := tc.Database.Instances[dbdog.DefaultDatabase]
+	dbi := tc.Database.Instances[dbsteps.Default]
 	dbi.Storage = l.Storage
-	tc.Database.Instances[dbdog.DefaultDatabase] = dbi
+	tc.Database.Instances[dbsteps.Default] = dbi
 
 	godogx.RegisterPrettyFailedFormatter()
 

@@ -58,7 +58,7 @@ func (l *BaseLocator) SetupDebugRouter() {
 
 	if pt, ok := l.StatsTracker().(*prom.Tracker); ok {
 		dr.AddLink("metrics", "Metrics")
-		dr.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(pt.Registry, promhttp.HandlerOpts{}))
+		dr.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(pt.PrometheusRegistry(), promhttp.HandlerOpts{}))
 	}
 
 	if lz, ok := l.CtxdLogger().(ctxz.Observer); ok {

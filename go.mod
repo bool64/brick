@@ -8,7 +8,6 @@ require (
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7
 	github.com/Masterminds/squirrel v1.5.2
 	github.com/bool64/ctxd v1.0.0
-	github.com/bool64/dbdog v0.4.2
 	github.com/bool64/dbwrap v0.1.3
 	github.com/bool64/dev v0.2.5
 	github.com/bool64/godogx v0.1.1
@@ -21,7 +20,8 @@ require (
 	github.com/bool64/zapctxd v1.0.0
 	github.com/cucumber/godog v0.12.3
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/godogx/httpsteps v0.2.1-0.20220109094343-c3a5353f705c
+	github.com/godogx/dbsteps v0.1.1
+	github.com/godogx/httpsteps v0.2.2-0.20220112161757-ab6759f4067c
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -44,6 +44,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-kit/log v0.1.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.0 // indirect
+	github.com/godogx/resource v0.1.0 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

@@ -27,7 +27,7 @@ func NewBaseRouter(l *BaseLocator) chi.Router {
 	r.Use(l.HTTPServerMiddlewares...)
 
 	if pt, ok := l.StatsTracker().(*prom.Tracker); ok {
-		r.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(pt.Registry, promhttp.HandlerOpts{}))
+		r.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(pt.PrometheusRegistry(), promhttp.HandlerOpts{}))
 	}
 
 	if l.BaseConfig.Debug.DevTools {
