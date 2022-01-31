@@ -18,17 +18,17 @@ require (
 	github.com/bool64/sqluct v0.1.9
 	github.com/bool64/stats v0.2.2
 	github.com/bool64/zapctxd v1.0.0
-	github.com/cucumber/godog v0.12.3
+	github.com/cucumber/godog v0.12.4
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/godogx/dbsteps v0.1.1
+	github.com/godogx/dbsteps v0.1.2
 	github.com/godogx/httpsteps v0.2.2-0.20220112161757-ab6759f4067c
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_golang v1.12.1
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggest/assertjson v1.6.8
-	github.com/swaggest/rest v0.2.18
+	github.com/swaggest/rest v0.2.19
 	github.com/swaggest/swgui v1.4.3
 	github.com/swaggest/usecase v1.1.0
 	github.com/vearutop/gooselite v0.1.1
@@ -69,7 +69,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggest/form/v5 v5.0.1 // indirect
 	github.com/swaggest/jsonschema-go v0.3.24 // indirect
-	github.com/swaggest/openapi-go v0.2.14 // indirect
+	github.com/swaggest/openapi-go v0.2.15 // indirect
 	github.com/swaggest/refl v1.0.1 // indirect
 	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect
 	github.com/vearutop/dynhist-go v1.1.0 // indirect
@@ -80,7 +80,7 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/net v0.0.0-20211105192438-b53810dc28af // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/api v0.30.0 // indirect
 	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987 // indirect
