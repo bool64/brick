@@ -8,12 +8,13 @@ import (
 
 	"github.com/bool64/brick"
 	"github.com/bool64/brick/config"
-	"github.com/bool64/dbdog"
 	"github.com/bool64/godogx"
 	"github.com/bool64/godogx/allure"
-	"github.com/bool64/httpdog"
+	"github.com/bool64/httpmock"
 	"github.com/bool64/shared"
 	"github.com/cucumber/godog"
+	"github.com/godogx/dbsteps"
+	"github.com/godogx/httpsteps"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,10 +22,11 @@ import (
 // Context is a test context for feature tests.
 type Context struct {
 	Vars                *shared.Vars
-	Local               *httpdog.Local
-	External            *httpdog.External
-	Database            *dbdog.Manager
+	Local               *httpsteps.LocalClient
+	External            *httpsteps.ExternalServer
+	Database            *dbsteps.Manager
 	ScenarioInitializer func(s *godog.ScenarioContext)
+	Concurrency         int
 }
 
 func newContext(t *testing.T) *Context {
@@ -33,16 +35,17 @@ func newContext(t *testing.T) *Context {
 	vars := &shared.Vars{}
 
 	tc := &Context{}
-	tc.Local = httpdog.NewLocal("")
-	tc.Local.JSONComparer.Vars = vars
-	tc.Local.Client.OnBodyMismatch = func(data []byte) {
-		assert.NoError(t, ioutil.WriteFile("_last_mismatch.json", data, 0o600))
-	}
+	tc.Local = httpsteps.NewLocalClient("", func(client *httpmock.Client) {
+		client.OnBodyMismatch = func(data []byte) {
+			assert.NoError(t, ioutil.WriteFile("_last_mismatch.json", data, 0o600))
+		}
+	})
+	tc.Local.Vars = vars
 
-	tc.External = &httpdog.External{}
+	tc.External = httpsteps.NewExternalServer()
 	tc.External.Vars = vars
 
-	tc.Database = dbdog.NewManager()
+	tc.Database = dbsteps.NewManager()
 	tc.Database.Vars = vars
 
 	return tc
@@ -64,11 +67,11 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 	addr, err := l.StartHTTPServer(router)
 	require.NoError(t, err)
 
-	tc.Local.SetBaseURL(addr)
+	require.NoError(t, tc.Local.SetBaseURL(addr, httpsteps.Default))
 
-	dbi := tc.Database.Instances[dbdog.DefaultDatabase]
+	dbi := tc.Database.Instances[dbsteps.Default]
 	dbi.Storage = l.Storage
-	tc.Database.Instances[dbdog.DefaultDatabase] = dbi
+	tc.Database.Instances[dbsteps.Default] = dbi
 
 	godogx.RegisterPrettyFailedFormatter()
 
@@ -90,6 +93,7 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 			Tags:          os.Getenv("GODOG_TAGS"),
 			StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
 			TestingT:      t,
+			Concurrency:   tc.Concurrency,
 		},
 	}
 
