@@ -12,15 +12,16 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/sqluct"
+	"github.com/bool64/stats"
 	"github.com/jmoiron/sqlx"
 	"github.com/vearutop/gooselite"
 	"github.com/vearutop/gooselite/iofs"
 )
 
 // SetupStorage initializes database pool and prepares storage.
-func SetupStorage(cfg Config, logger ctxd.Logger, driverName string, conn driver.Connector, migrations fs.FS) (*sqluct.Storage, error) {
+func SetupStorage(cfg Config, logger ctxd.Logger, statsTracker stats.Tracker, driverName string, conn driver.Connector, migrations fs.FS) (*sqluct.Storage, error) {
 	conn = WithTracing(conn)
-	conn = WithQueriesLogging(conn, logger)
+	conn = WithQueriesLogging(conn, logger, statsTracker)
 
 	db := sql.OpenDB(conn)
 	db.SetMaxIdleConns(cfg.MaxIdle)
@@ -64,7 +65,7 @@ func SetupStorage(cfg Config, logger ctxd.Logger, driverName string, conn driver
 
 // GooseLogger adapts contextualized logger for goose.
 type gooseLogger struct {
-	c context.Context
+	c context.Context // nolint:containedctx // Implemented interface is not contextualized, so ctx is contained.
 	l ctxd.Logger
 }
 

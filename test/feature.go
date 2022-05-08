@@ -1,6 +1,7 @@
 package test
 
 import (
+	"flag"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -51,6 +52,8 @@ func newContext(t *testing.T) *Context {
 	return tc
 }
 
+var feature = flag.String("feature", "features", "Feature file to test.")
+
 // RunFeatures runs feature tests.
 func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init func(tc *Context) (*brick.BaseLocator, http.Handler)) {
 	t.Helper()
@@ -89,7 +92,7 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 		Options: &godog.Options{
 			Format:        "pretty-failed",
 			Strict:        true,
-			Paths:         []string{"features"},
+			Paths:         []string{*feature},
 			Tags:          os.Getenv("GODOG_TAGS"),
 			StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
 			TestingT:      t,

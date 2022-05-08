@@ -23,5 +23,5 @@ type Config struct {
 	// can be useful for non-production environments.
 	ExposePanic bool `split_words:"true"`
 
-	OnPanic []func(ctx context.Context, rcv interface{}, stack []byte) `ignored:"true"`
+	OnPanic []func(ctx context.Context, rcv interface{}, stack []byte) `json:"-" ignored:"true"`
 }
