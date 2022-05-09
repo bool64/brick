@@ -52,7 +52,7 @@ func TestNewBaseLocator(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, l)
 
-	r := brick.NewBaseRouter(l)
+	r := brick.NewBaseWebService(l)
 	serviceURLPrefix := "/" + cfg.ServiceName
 
 	uc := usecase.NewIOI(nil, nil, func(ctx context.Context, input, output interface{}) error {

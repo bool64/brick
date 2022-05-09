@@ -28,6 +28,9 @@ type BaseConfig struct {
 
 	// Debug controls dev tools.
 	Debug debug.Config `split_words:"true"`
+
+	// CacheTransferURL is URL to fetch cache from on application start.
+	CacheTransferURL string `split_words:"true"`
 }
 
 // WithBaseConfig is an embedded config accessor.

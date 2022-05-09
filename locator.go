@@ -5,11 +5,13 @@ import (
 
 	"github.com/bool64/brick/debug"
 	"github.com/bool64/brick/graceful"
+	"github.com/bool64/cache"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/sqluct"
 	"github.com/bool64/stats"
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/request"
+	"github.com/swaggest/rest/web"
 	"github.com/swaggest/usecase"
 )
 
@@ -24,9 +26,14 @@ type BaseLocator struct {
 
 	UseCaseMiddlewares []usecase.Middleware
 
-	HTTPRequestDecoder    *request.DecoderFactory
-	HTTPServerMiddlewares []func(h http.Handler) http.Handler
-	OpenAPI               *openapi.Collector
+	// HTTPServiceOptions can be used to configure low-level middlewares like middleware.StripSlashes on an
+	// initialized web.Service.
+	HTTPServiceOptions     []func(s *web.Service, initialized bool)
+	HTTPRecoveryMiddleware func(h http.Handler) http.Handler
+	HTTPRequestDecoder     *request.DecoderFactory
+	HTTPServerMiddlewares  []func(h http.Handler) http.Handler
+	OpenAPI                *openapi.Collector
 
-	Storage *sqluct.Storage
+	Storage       *sqluct.Storage
+	CacheTransfer *cache.HTTPTransfer
 }

@@ -10,6 +10,7 @@ import (
 	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/dbwrap"
+	"github.com/bool64/stats"
 	"go.opencensus.io/trace"
 )
 
@@ -25,9 +26,13 @@ func WithTracing(dbConnector driver.Connector) driver.Connector {
 }
 
 // WithQueriesLogging instruments database connector with query logging.
-func WithQueriesLogging(dbConnector driver.Connector, logger ctxd.Logger) driver.Connector {
+func WithQueriesLogging(dbConnector driver.Connector, logger ctxd.Logger, statsTracker stats.Tracker) driver.Connector {
 	if logger == nil {
 		logger = ctxd.NoOpLogger{}
+	}
+
+	if statsTracker == nil {
+		statsTracker = stats.NoOp{}
 	}
 
 	skipPackages := []string{
@@ -49,12 +54,12 @@ func WithQueriesLogging(dbConnector driver.Connector, logger ctxd.Logger) driver
 		// This option limits middleware applicability.
 		dbwrap.WithOperations(dbwrap.Query, dbwrap.StmtQuery, dbwrap.Exec, dbwrap.StmtExec),
 
-		// This middleware logs statements with arguments at DEBUG level.
-		dbwrap.WithMiddleware(log(logger, skipPackages)),
+		// This middleware logs statements with arguments at DEBUG level and counts stats.
+		dbwrap.WithMiddleware(observe(logger, statsTracker, skipPackages)),
 	)
 }
 
-func log(logger ctxd.Logger, skipPackages []string) dbwrap.Middleware {
+func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []string) dbwrap.Middleware {
 	return func(
 		ctx context.Context,
 		operation dbwrap.Operation,
@@ -75,6 +80,8 @@ func log(logger ctxd.Logger, skipPackages []string) dbwrap.Middleware {
 			trace.StringAttribute("args", fmt.Sprintf("%v", args)),
 		)
 
+		statsTracker.Add(ctx, "sql_storage_queries_total", 1, "method", caller)
+
 		started := time.Now()
 
 		return ctx, func(err error) {
@@ -92,6 +99,9 @@ func log(logger ctxd.Logger, skipPackages []string) dbwrap.Middleware {
 
 				res = " failed"
 			}
+
+			statsTracker.Add(ctx, "sql_storage_queries_seconds", time.Since(started).Seconds(),
+				"method", caller)
 
 			logger.Debug(ctx, caller+" "+string(operation)+res,
 				"stmt", statement,

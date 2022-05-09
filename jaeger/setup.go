@@ -29,7 +29,7 @@ type Config struct {
 	// an error occurred when uploading the stats data.
 	// If no custom hook is set, errors are logged.
 	// Optional.
-	OnError func(err error)
+	OnError func(err error) `json:"-"`
 
 	// Username to be used if basic auth is required.
 	// Optional.

@@ -8,36 +8,34 @@ import (
 	"net/http"
 
 	"github.com/bool64/prom-stats"
-	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/swaggest/rest"
 	"github.com/swaggest/rest/chirouter"
-	v3 "github.com/swaggest/swgui/v3"
+	"github.com/swaggest/rest/web"
+	swgui "github.com/swaggest/swgui/v4emb"
 )
 
-// NewBaseRouter initializes default http router.
-func NewBaseRouter(l *BaseLocator) chi.Router {
+// NewBaseWebService initializes default http router.
+func NewBaseWebService(l *BaseLocator) *web.Service {
 	l.HTTPRequestDecoder.ApplyDefaults = true
 	l.HTTPRequestDecoder.SetDecoderFunc(rest.ParamInPath, chirouter.PathToURLValues)
 
 	// Create router.
-	r := chirouter.NewWrapper(chi.NewRouter())
+	r := web.DefaultService(l.HTTPServiceOptions...)
 
 	// Setup middlewares.
-	r.Use(l.HTTPServerMiddlewares...)
+	r.Wrap(l.HTTPServerMiddlewares...)
 
 	if pt, ok := l.StatsTracker().(*prom.Tracker); ok {
 		r.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(pt.PrometheusRegistry(), promhttp.HandlerOpts{}))
 	}
 
 	if l.BaseConfig.Debug.DevTools {
-		MountDevPortal(r, l)
+		MountDevPortal(r.Wrapper, l)
 	}
 
 	// Swagger UI endpoint at /docs.
-	r.Method(http.MethodGet, "/docs/openapi.json", l.OpenAPI)
-	r.Mount("/docs", v3.NewHandler(l.OpenAPI.Reflector().SpecEns().Info.Title,
-		"/docs/openapi.json", "/docs"))
+	r.Docs("/docs", swgui.New)
 
 	return r
 }
@@ -52,8 +50,8 @@ func NewBaseRouter(l *BaseLocator) chi.Router {
 func (l *BaseLocator) StartHTTPServer(handler http.Handler) (string, error) {
 	cfg := l.BaseConfig
 
-	if cfg.HTTPListenAddr == "" {
-		cfg.HTTPListenAddr = ":0"
+	if cfg.HTTPListenAddr == "" || cfg.HTTPListenAddr == ":0" {
+		cfg.HTTPListenAddr = "127.0.0.1:0"
 	}
 
 	listener, err := net.Listen("tcp", cfg.HTTPListenAddr)

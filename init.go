@@ -4,10 +4,12 @@ import (
 	"time"
 
 	ocprom "contrib.go.opencensus.io/exporter/prometheus"
+	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/bool64/brick/graceful"
 	"github.com/bool64/brick/log"
 	"github.com/bool64/brick/opencensus"
 	ucase "github.com/bool64/brick/usecase"
+	"github.com/bool64/cache"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/logz"
 	"github.com/bool64/logz/ctxz"
@@ -16,11 +18,10 @@ import (
 	"github.com/bool64/zapctxd"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
-	"github.com/swaggest/rest/jsonschema"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/request"
-	"github.com/swaggest/rest/response"
+	"github.com/swaggest/rest/web"
 	"github.com/swaggest/usecase"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
@@ -31,13 +32,8 @@ func NoOpLocator() *BaseLocator {
 	bl := &BaseLocator{}
 
 	bl.OpenAPI = &openapi.Collector{}
-	bl.HTTPRequestDecoder = request.NewDecoderFactory()
 	bl.LoggerProvider = ctxd.NoOpLogger{}
 	bl.TrackerProvider = stats.NoOp{}
-
-	bl.HTTPServerMiddlewares = append(bl.HTTPServerMiddlewares,
-		nethttp.OpenAPIMiddleware(bl.OpenAPI), // Documentation collector.
-	)
 
 	return bl
 }
@@ -64,6 +60,7 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 	l.UseCaseMiddlewares = []usecase.Middleware{
 		opencensus.UseCaseMiddleware{},
 		ucase.StatsMiddleware(l.StatsTracker()),
+		log.UsecaseErrors(l.CtxdLogger()),
 	}
 
 	if cfg.Debug.TraceSamplingProbability > 0 {
@@ -72,23 +69,31 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		})
 	}
 
-	// Init request decoder and validator.
-	validatorFactory := jsonschema.NewFactory(l.OpenAPI, l.OpenAPI)
+	l.HTTPRecoveryMiddleware = log.HTTPRecover{ // Panic recovery and request logging.
+		Logger:      l.CtxdLogger(),
+		FieldNames:  l.BaseConfig.Log.FieldNames,
+		PrintPanic:  cfg.Log.DevMode,
+		ExposePanic: cfg.Debug.ExposePanic,
+	}.Middleware()
+
+	l.HTTPServiceOptions = append(l.HTTPServiceOptions, func(s *web.Service, initialized bool) {
+		if !initialized {
+			s.OpenAPI = l.OpenAPI.Reflector().Spec
+			s.OpenAPICollector = l.OpenAPI
+			s.PanicRecoveryMiddleware = l.HTTPRecoveryMiddleware
+			s.DecoderFactory = l.HTTPRequestDecoder
+		}
+	})
 
 	l.HTTPServerMiddlewares = append(l.HTTPServerMiddlewares,
-		log.HTTPRecover{
-			Logger:      l.CtxdLogger(),
-			FieldNames:  l.BaseConfig.Log.FieldNames,
-			PrintPanic:  cfg.Log.DevMode,
-			ExposePanic: cfg.Debug.ExposePanic,
-		}.Middleware(), // Panic recovery and request logging.
 		opencensus.Middleware, // Tracing.
 		log.HTTPTraceTransaction(l.BaseConfig.Log.FieldNames), // Trace transaction.
 		nethttp.UseCaseMiddlewares(l.UseCaseMiddlewares...),   // Use case middlewares.
-		request.DecoderMiddleware(l.HTTPRequestDecoder),       // Request decoder setup.
-		request.ValidatorMiddleware(validatorFactory),         // Request validator setup.
-		response.EncoderMiddleware,                            // Response encoder setup.
 	)
+
+	l.CacheTransfer = &cache.HTTPTransfer{
+		Logger: l.CtxdLogger(),
+	}
 
 	if err := setupPrometheus(l); err != nil {
 		return l, err
@@ -112,6 +117,10 @@ func setupPrometheus(l *BaseLocator) error {
 		return err
 	}
 
+	if err := view.Register(ocsql.DefaultViews...); err != nil {
+		return err
+	}
+
 	// Initialize opencensus prometheus exporter.
 	promExporter, err := ocprom.NewExporter(ocprom.Options{
 		Registry: promReg,
@@ -124,6 +133,7 @@ func setupPrometheus(l *BaseLocator) error {
 
 	l.OnShutdown("unregister_oc_prom", func() {
 		view.Unregister(opencensus.Views()...)
+		view.Unregister(ocsql.DefaultViews...)
 		view.UnregisterExporter(promExporter)
 	})
 

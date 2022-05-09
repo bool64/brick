@@ -2,11 +2,15 @@
 package config
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	jsval "github.com/santhosh-tekuri/jsonschema/v3"
+	"github.com/swaggest/jsonschema-go"
 )
 
 // WithEnvFiles populates env vars from provided files.
@@ -82,5 +86,48 @@ func Load(prefix string, spec interface{}, loaders ...func() error) error {
 		}
 	}
 
-	return envconfig.Process(prefix, spec)
+	err := envconfig.Process(prefix, spec)
+	if err != nil {
+		return err
+	}
+
+	return validate(spec)
+}
+
+func validate(spec interface{}) error {
+	specj, err := json.Marshal(spec)
+	if err != nil {
+		return fmt.Errorf("json marshal: %w", err)
+	}
+
+	schema, err := (&jsonschema.Reflector{}).Reflect(spec, jsonschema.ProcessWithoutTags, func(rc *jsonschema.ReflectContext) {
+		rc.SkipNonConstraints = true
+	})
+	if err != nil {
+		return fmt.Errorf("reflect schema: %w", err)
+	}
+
+	js, err := schema.MarshalJSON()
+	if err != nil {
+		return fmt.Errorf("marshal schema: %w", err)
+	}
+
+	compiler := jsval.NewCompiler()
+
+	err = compiler.AddResource("schema.json", bytes.NewReader(js))
+	if err != nil {
+		return fmt.Errorf("validator add schema: %w", err)
+	}
+
+	sch, err := compiler.Compile("schema.json")
+	if err != nil {
+		return fmt.Errorf("validator compile schema: %w", err)
+	}
+
+	err = sch.Validate(bytes.NewReader(specj))
+	if err != nil {
+		return fmt.Errorf("validate: %w", err)
+	}
+
+	return nil
 }
