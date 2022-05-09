@@ -1,12 +1,13 @@
 module github.com/bool64/brick
 
-go 1.17
+go 1.18
 
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/prometheus v0.4.1
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7
 	github.com/Masterminds/squirrel v1.5.2
+	github.com/bool64/cache v0.2.5
 	github.com/bool64/ctxd v1.1.3
 	github.com/bool64/dbwrap v0.1.3
 	github.com/bool64/dev v0.2.10

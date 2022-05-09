@@ -9,6 +9,7 @@ import (
 	"github.com/bool64/brick/log"
 	"github.com/bool64/brick/opencensus"
 	ucase "github.com/bool64/brick/usecase"
+	"github.com/bool64/cache"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/logz"
 	"github.com/bool64/logz/ctxz"
@@ -90,6 +91,10 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		log.HTTPTraceTransaction(l.BaseConfig.Log.FieldNames), // Trace transaction.
 		nethttp.UseCaseMiddlewares(l.UseCaseMiddlewares...),   // Use case middlewares.
 	)
+
+	l.CacheTransfer = &cache.HTTPTransfer{
+		Logger: l.CtxdLogger(),
+	}
 
 	if err := setupPrometheus(l); err != nil {
 		return l, err
