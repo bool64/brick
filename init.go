@@ -69,8 +69,7 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		})
 	}
 
-	// Panic recovery and request logging.
-	l.HTTPRecoveryMiddleware = log.HTTPRecover{
+	l.HTTPRecoveryMiddleware = log.HTTPRecover{ // Panic recovery and request logging.
 		Logger:      l.CtxdLogger(),
 		FieldNames:  l.BaseConfig.Log.FieldNames,
 		PrintPanic:  cfg.Log.DevMode,
