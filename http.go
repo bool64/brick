@@ -9,17 +9,12 @@ import (
 
 	"github.com/bool64/prom-stats"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/swaggest/rest"
-	"github.com/swaggest/rest/chirouter"
 	"github.com/swaggest/rest/web"
 	swgui "github.com/swaggest/swgui/v4emb"
 )
 
 // NewBaseWebService initializes default http router.
 func NewBaseWebService(l *BaseLocator) *web.Service {
-	l.HTTPRequestDecoder.ApplyDefaults = true
-	l.HTTPRequestDecoder.SetDecoderFunc(rest.ParamInPath, chirouter.PathToURLValues)
-
 	// Create router.
 	r := web.DefaultService(l.HTTPServiceOptions...)
 

@@ -6,11 +6,11 @@ require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	contrib.go.opencensus.io/exporter/prometheus v0.4.1
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7
-	github.com/Masterminds/squirrel v1.5.2
-	github.com/bool64/cache v0.2.5
+	github.com/Masterminds/squirrel v1.5.3
+	github.com/bool64/cache v0.2.7
 	github.com/bool64/ctxd v1.1.3
 	github.com/bool64/dbwrap v0.1.3
-	github.com/bool64/dev v0.2.10
+	github.com/bool64/dev v0.2.11
 	github.com/bool64/godogx v0.1.1
 	github.com/bool64/httpmock v0.1.1
 	github.com/bool64/logz v1.1.0
@@ -26,10 +26,10 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/prometheus/client_golang v1.12.1
+	github.com/prometheus/client_golang v1.12.2
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0
 	github.com/stretchr/testify v1.7.1
-	github.com/swaggest/assertjson v1.6.8
+	github.com/swaggest/assertjson v1.7.0
 	github.com/swaggest/jsonschema-go v0.3.35
 	github.com/swaggest/rest v0.2.28
 	github.com/swaggest/swgui v1.4.5
@@ -89,5 +89,5 @@ require (
 	google.golang.org/grpc v1.33.2 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 )

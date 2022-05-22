@@ -10,7 +10,6 @@ import (
 	"github.com/bool64/sqluct"
 	"github.com/bool64/stats"
 	"github.com/swaggest/rest/openapi"
-	"github.com/swaggest/rest/request"
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/usecase"
 )
@@ -30,7 +29,6 @@ type BaseLocator struct {
 	// initialized web.Service.
 	HTTPServiceOptions     []func(s *web.Service, initialized bool)
 	HTTPRecoveryMiddleware func(h http.Handler) http.Handler
-	HTTPRequestDecoder     *request.DecoderFactory
 	HTTPServerMiddlewares  []func(h http.Handler) http.Handler
 	OpenAPI                *openapi.Collector
 
