@@ -11,6 +11,7 @@ import (
 	ucase "github.com/bool64/brick/usecase"
 	"github.com/bool64/cache"
 	"github.com/bool64/ctxd"
+	"github.com/bool64/dev/version"
 	"github.com/bool64/logz"
 	"github.com/bool64/logz/ctxz"
 	"github.com/bool64/prom-stats"
@@ -20,7 +21,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/openapi"
-	"github.com/swaggest/rest/request"
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/usecase"
 	"go.opencensus.io/stats/view"
@@ -32,6 +32,27 @@ func NoOpLocator() *BaseLocator {
 	bl := &BaseLocator{}
 
 	bl.OpenAPI = &openapi.Collector{}
+
+	ver := version.Info()
+	spec := bl.OpenAPI.Reflector().SpecEns()
+
+	if ver.Version == "dev" {
+		spec.Info.Version = ver.String()
+	} else {
+		spec.Info.Version = ver.Version
+	}
+
+	if ver.Revision != "" {
+		bl.OpenAPI.Reflector().SpecEns().Info.WithMapOfAnythingItem("x-rev", ver.Revision)
+	}
+
+	bl.HTTPServiceOptions = append(bl.HTTPServiceOptions, func(s *web.Service, initialized bool) {
+		if !initialized {
+			s.OpenAPI = bl.OpenAPI.Reflector().Spec
+			s.OpenAPICollector = bl.OpenAPI
+		}
+	})
+
 	bl.LoggerProvider = ctxd.NoOpLogger{}
 	bl.TrackerProvider = stats.NoOp{}
 
@@ -55,8 +76,6 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		MaxSamples:     50,
 	})
 
-	l.HTTPRequestDecoder = request.NewDecoderFactory()
-
 	l.UseCaseMiddlewares = []usecase.Middleware{
 		opencensus.UseCaseMiddleware{},
 		ucase.StatsMiddleware(l.StatsTracker()),
@@ -78,10 +97,7 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 
 	l.HTTPServiceOptions = append(l.HTTPServiceOptions, func(s *web.Service, initialized bool) {
 		if !initialized {
-			s.OpenAPI = l.OpenAPI.Reflector().Spec
-			s.OpenAPICollector = l.OpenAPI
 			s.PanicRecoveryMiddleware = l.HTTPRecoveryMiddleware
-			s.DecoderFactory = l.HTTPRequestDecoder
 		}
 	})
 
