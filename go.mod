@@ -21,6 +21,7 @@ require (
 	github.com/bool64/zapctxd v1.0.0
 	github.com/cucumber/godog v0.12.5
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/godogx/allure v0.0.0-20210907120006-614bfce80f34
 	github.com/godogx/dbsteps v0.1.2
 	github.com/godogx/httpsteps v0.2.3
 	github.com/jmoiron/sqlx v1.3.5
