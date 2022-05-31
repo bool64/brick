@@ -10,7 +10,7 @@ require (
 	github.com/bool64/cache v0.2.7
 	github.com/bool64/ctxd v1.1.3
 	github.com/bool64/dbwrap v0.1.3
-	github.com/bool64/dev v0.2.11
+	github.com/bool64/dev v0.2.12
 	github.com/bool64/godogx v0.1.1
 	github.com/bool64/httpmock v0.1.1
 	github.com/bool64/logz v1.1.0
@@ -33,7 +33,7 @@ require (
 	github.com/swaggest/jsonschema-go v0.3.35
 	github.com/swaggest/rest v0.2.28
 	github.com/swaggest/swgui v1.4.5
-	github.com/swaggest/usecase v1.1.2
+	github.com/swaggest/usecase v1.1.3
 	github.com/vearutop/gooselite v0.1.1
 	go.opencensus.io v0.23.0
 	go.uber.org/zap v1.21.0

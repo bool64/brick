@@ -27,6 +27,7 @@ type Context struct {
 	External            *httpsteps.ExternalServer
 	Database            *dbsteps.Manager
 	ScenarioInitializer func(s *godog.ScenarioContext)
+	OptionsInitializer  func(options *godog.Options)
 	Concurrency         int
 }
 
@@ -78,6 +79,20 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 
 	godogx.RegisterPrettyFailedFormatter()
 
+	options := godog.Options{
+		Format:        "pretty-failed",
+		Strict:        true,
+		Paths:         []string{*feature},
+		Tags:          os.Getenv("GODOG_TAGS"),
+		StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
+		TestingT:      t,
+		Concurrency:   tc.Concurrency,
+	}
+
+	if tc.OptionsInitializer != nil {
+		tc.OptionsInitializer(&options)
+	}
+
 	suite := godog.TestSuite{
 		Name: cfg.Base().ServiceName + "-integration-test",
 		ScenarioInitializer: func(s *godog.ScenarioContext) {
@@ -89,15 +104,7 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 				tc.ScenarioInitializer(s)
 			}
 		},
-		Options: &godog.Options{
-			Format:        "pretty-failed",
-			Strict:        true,
-			Paths:         []string{*feature},
-			Tags:          os.Getenv("GODOG_TAGS"),
-			StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
-			TestingT:      t,
-			Concurrency:   tc.Concurrency,
-		},
+		Options: &options,
 	}
 
 	if os.Getenv("GODOG_ALLURE") != "" {
