@@ -16,6 +16,8 @@ linters-settings:
     check-exported: false
   unparam:
     check-exported: true
+  funlen:
+    lines: 70
 
 linters:
   enable-all: true
@@ -50,5 +52,12 @@ issues:
         - noctx
         - funlen
         - dupl
+        - structcheck
+        - unused
+        - unparam
+        - nosnakecase
       path: "_test.go"
+    - linters:
+        - errcheck # Error checking omitted for brevity.
+      path: "example_"
 

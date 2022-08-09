@@ -10,7 +10,8 @@ import (
 // that does not belong to skipped packages.
 //
 // For example the result could be
-//    myapp/mypackage.MyType.myFunction
+//
+//	myapp/mypackage.MyType.myFunction
 func Ancestor(skipCallers, stackSize int, skipPackages ...string) string {
 	p := ""
 	pc := make([]uintptr, stackSize)

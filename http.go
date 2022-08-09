@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/bool64/prom-stats"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -55,7 +56,10 @@ func (l *BaseLocator) StartHTTPServer(handler http.Handler) (string, error) {
 	}
 
 	// Initialize HTTP server.
-	srv := http.Server{Handler: handler}
+	srv := http.Server{
+		Handler:           handler,
+		ReadHeaderTimeout: 10 * time.Second,
+	}
 
 	// Start HTTP server.
 	l.CtxdLogger().Important(context.Background(), fmt.Sprintf("starting server, Swagger UI at http://%s/docs",

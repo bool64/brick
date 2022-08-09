@@ -7,7 +7,7 @@ import (
 )
 
 // Views lists OpenCensus views rendered as metrics.
-func Views() []*view.View { // nolint:funlen
+func Views() []*view.View { //nolint:funlen
 	return []*view.View{
 		{
 			Name:        "http/server/request_count",

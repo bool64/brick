@@ -2,7 +2,6 @@ package test
 
 import (
 	"flag"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
@@ -39,7 +38,7 @@ func newContext(t *testing.T) *Context {
 	tc := &Context{}
 	tc.Local = httpsteps.NewLocalClient("", func(client *httpmock.Client) {
 		client.OnBodyMismatch = func(data []byte) {
-			assert.NoError(t, ioutil.WriteFile("_last_mismatch.json", data, 0o600))
+			assert.NoError(t, os.WriteFile("_last_mismatch.json", data, 0o600))
 		}
 	})
 	tc.Local.Vars = vars

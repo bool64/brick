@@ -52,7 +52,8 @@ type Config struct {
 // Setup configures Jaeger Exporter for OpenCensus traces.
 //
 // Add Jaeger to service configuration:
-//    Jaeger jaeger.Config `split_words:"true"`
+//
+//	Jaeger jaeger.Config `split_words:"true"`
 func Setup(cfg Config, l deps) error {
 	if cfg.AgentEndpoint == "" && cfg.CollectorEndpoint == "" {
 		l.CtxdLogger().Info(context.Background(), "skipping jaeger setup")
