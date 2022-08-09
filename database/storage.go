@@ -65,7 +65,7 @@ func SetupStorage(cfg Config, logger ctxd.Logger, statsTracker stats.Tracker, dr
 
 // GooseLogger adapts contextualized logger for goose.
 type gooseLogger struct {
-	c context.Context // nolint:containedctx // Implemented interface is not contextualized, so ctx is contained.
+	c context.Context //nolint:containedctx // Implemented interface is not contextualized, so ctx is contained.
 	l ctxd.Logger
 }
 

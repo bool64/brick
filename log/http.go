@@ -116,7 +116,7 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 			defer func() {
 				rvr := recover()
 
-				// nolint:errorlint,goerr113 // Panic with sentinel error is not wrapped.
+				//nolint:errorlint,goerr113 // Panic with sentinel error is not wrapped.
 				if rvr == nil || rvr == http.ErrAbortHandler {
 					return
 				}
