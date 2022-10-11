@@ -10,13 +10,13 @@ require (
 	github.com/bool64/cache v0.2.7
 	github.com/bool64/ctxd v1.1.3
 	github.com/bool64/dbwrap v0.1.3
-	github.com/bool64/dev v0.2.19
+	github.com/bool64/dev v0.2.22
 	github.com/bool64/godogx v0.1.1
 	github.com/bool64/httpmock v0.1.6
 	github.com/bool64/logz v1.1.0
 	github.com/bool64/prom-stats v0.1.3
 	github.com/bool64/shared v0.1.5
-	github.com/bool64/sqluct v0.1.9
+	github.com/bool64/sqluct v0.1.10
 	github.com/bool64/stats v0.2.2
 	github.com/bool64/zapctxd v1.0.0
 	github.com/cucumber/godog v0.12.5
