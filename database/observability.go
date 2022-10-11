@@ -16,17 +16,35 @@ import (
 
 // WithTracing instruments database connector with OpenCensus tracing.
 func WithTracing(dbConnector driver.Connector) driver.Connector {
-	return ocsql.WrapConnector(dbConnector,
+	return ocsql.WrapConnector(dbConnector, tracingOptions()...)
+}
+
+// DriverNameWithTracing registers database driver name with OpenCensus tracing.
+func DriverNameWithTracing(driverName string) (string, error) {
+	return ocsql.Register(driverName, tracingOptions()...)
+}
+
+func tracingOptions() []ocsql.TraceOption {
+	return []ocsql.TraceOption{
 		ocsql.WithQuery(true),
 		ocsql.WithRowsClose(true),
 		ocsql.WithRowsAffected(true),
 		ocsql.WithAllowRoot(true),
 		ocsql.WithDisableErrSkip(true),
-	)
+	}
 }
 
 // WithQueriesLogging instruments database connector with query logging.
 func WithQueriesLogging(dbConnector driver.Connector, logger ctxd.Logger, statsTracker stats.Tracker) driver.Connector {
+	return dbwrap.WrapConnector(dbConnector, wrapOptions(logger, statsTracker)...)
+}
+
+// DriverNameWithQueriesLogging registers database driver name with query logging.
+func DriverNameWithQueriesLogging(driverName string, logger ctxd.Logger, statsTracker stats.Tracker) (string, error) {
+	return dbwrap.Register(driverName, wrapOptions(logger, statsTracker)...)
+}
+
+func wrapOptions(logger ctxd.Logger, statsTracker stats.Tracker) []dbwrap.Option {
 	if logger == nil {
 		logger = ctxd.NoOpLogger{}
 	}
@@ -41,7 +59,7 @@ func WithQueriesLogging(dbConnector driver.Connector, logger ctxd.Logger, statsT
 		"github.com/jmoiron/sqlx",
 	}
 
-	return dbwrap.WrapConnector(dbConnector,
+	return []dbwrap.Option{
 		// This interceptor enables reverse debugging from DB side.
 		dbwrap.WithInterceptor(func(ctx context.Context, operation dbwrap.Operation, statement string, args []driver.NamedValue) (context.Context, string, []driver.NamedValue) {
 			// Closest caller in the stack with package not equal to listed and to "database/sql".
@@ -56,7 +74,7 @@ func WithQueriesLogging(dbConnector driver.Connector, logger ctxd.Logger, statsT
 
 		// This middleware logs statements with arguments at DEBUG level and counts stats.
 		dbwrap.WithMiddleware(observe(logger, statsTracker, skipPackages)),
-	)
+	}
 }
 
 func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []string) dbwrap.Middleware {
