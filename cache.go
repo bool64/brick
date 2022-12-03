@@ -19,22 +19,32 @@ func (l *BaseLocator) TransferCache(ctx context.Context) error {
 }
 
 // MakeCacheOf creates an instance of failover cache and adds it to cache transfer.
-func MakeCacheOf[V any](l *BaseLocator, name string, ttl time.Duration) *cache.FailoverOf[V] {
-	backend := cache.NewShardedMapOf[V](func(cfg *cache.Config) {
-		cfg.Name = name
-		cfg.Logger = l.CtxdLogger()
-		cfg.Stats = l.StatsTracker()
-		cfg.TimeToLive = ttl
+func MakeCacheOf[V any](l *BaseLocator, name string, ttl time.Duration, options ...func(cfg *cache.FailoverConfigOf[V])) *cache.FailoverOf[V] {
+	cfg := cache.FailoverConfigOf[V]{}
+	cfg.Name = name
+	cfg.Stats = l.StatsTracker()
+	cfg.Logger = l.CtxdLogger()
+
+	for _, option := range options {
+		option(&cfg)
+	}
+
+	if cfg.Backend == nil {
+		cfg.Backend = cache.NewShardedMapOf[V](func(cfg *cache.Config) {
+			cfg.Name = name
+			cfg.Logger = l.CtxdLogger()
+			cfg.Stats = l.StatsTracker()
+			cfg.TimeToLive = ttl
+		})
+	}
+
+	greetingsCache := cache.NewFailoverOf[V](func(c *cache.FailoverConfigOf[V]) {
+		*c = cfg
 	})
 
-	greetingsCache := cache.NewFailoverOf[V](func(cfg *cache.FailoverConfigOf[V]) {
-		cfg.Name = name
-		cfg.Stats = l.StatsTracker()
-		cfg.Logger = l.CtxdLogger()
-		cfg.Backend = backend
-	})
-
-	l.CacheTransfer.AddCache(name, backend.WalkDumpRestorer())
+	if w, ok := cfg.Backend.(cache.WalkDumpRestorer); ok {
+		l.CacheTransfer.AddCache(name, w)
+	}
 
 	return greetingsCache
 }
