@@ -18,23 +18,24 @@ import (
 //	ctx, finish := opencensus.AddSpan(ctx,
 //		trace.StringAttribute("key", "value"),
 //	)
-//	defer func() { finish(err) }()
-func AddSpan(ctx context.Context, attributes ...trace.Attribute) (context.Context, func(error)) {
+//	defer finish(&err)
+func AddSpan(ctx context.Context, attributes ...trace.Attribute) (context.Context, func(*error)) {
 	ctx, span := trace.StartSpan(ctx, runtime.CallerFunc(2))
 	span.AddAttributes(attributes...)
 
-	return ctx, func(err error) {
-		if err != nil {
+	return ctx, func(err *error) {
+		if err != nil && *err != nil {
+			e := *err
 			st := status.Unknown
 
 			var ws errorWithStatus
-			if errors.As(err, &ws) {
+			if errors.As(e, &ws) {
 				st = ws.Status()
 			}
 
 			span.SetStatus(trace.Status{
 				Code:    int32(st),
-				Message: err.Error(),
+				Message: e.Error(),
 			})
 		}
 
