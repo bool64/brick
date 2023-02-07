@@ -11,6 +11,7 @@ import (
 	"github.com/bool64/stats"
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/web"
+	"github.com/swaggest/swgui"
 	"github.com/swaggest/usecase"
 )
 
@@ -31,6 +32,7 @@ type BaseLocator struct {
 	HTTPRecoveryMiddleware func(h http.Handler) http.Handler
 	HTTPServerMiddlewares  []func(h http.Handler) http.Handler
 	OpenAPI                *openapi.Collector
+	SwaggerUIOptions       []func(cfg *swgui.Config)
 
 	Storage       *sqluct.Storage
 	CacheTransfer *cache.HTTPTransfer

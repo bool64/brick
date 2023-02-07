@@ -7,34 +7,34 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7
 	github.com/Masterminds/squirrel v1.5.3
-	github.com/bool64/cache v0.2.7
-	github.com/bool64/ctxd v1.2.0
+	github.com/bool64/cache v0.4.4
+	github.com/bool64/ctxd v1.2.1
 	github.com/bool64/dbwrap v0.1.3
-	github.com/bool64/dev v0.2.22
+	github.com/bool64/dev v0.2.24
 	github.com/bool64/godogx v0.1.1
 	github.com/bool64/httpmock v0.1.8
 	github.com/bool64/logz v1.1.0
 	github.com/bool64/prom-stats v0.1.3
 	github.com/bool64/shared v0.1.5
-	github.com/bool64/sqluct v0.1.10
+	github.com/bool64/sqluct v0.1.12
 	github.com/bool64/stats v0.2.2
 	github.com/bool64/zapctxd v1.0.0
-	github.com/cucumber/godog v0.12.5
-	github.com/go-chi/chi/v5 v5.0.7
+	github.com/cucumber/godog v0.12.6
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/godogx/allure v0.2.0
 	github.com/godogx/dbsteps v0.1.2
 	github.com/godogx/httpsteps v0.2.5
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/prometheus/client_golang v1.14.0
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0
 	github.com/stretchr/testify v1.8.1
 	github.com/swaggest/assertjson v1.7.0
-	github.com/swaggest/jsonschema-go v0.3.43
-	github.com/swaggest/rest v0.2.36
-	github.com/swaggest/swgui v1.5.1
-	github.com/swaggest/usecase v1.2.0
+	github.com/swaggest/jsonschema-go v0.3.47
+	github.com/swaggest/rest v0.2.39
+	github.com/swaggest/swgui v1.6.0
+	github.com/swaggest/usecase v1.2.1
 	github.com/vearutop/gooselite v0.1.1
 	go.opencensus.io v0.24.0
 	go.uber.org/zap v1.24.0
@@ -42,19 +42,19 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cucumber/gherkin-go/v19 v19.0.3 // indirect
 	github.com/cucumber/messages-go/v16 v16.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/godogx/resource v0.1.1 // indirect
-	github.com/gofrs/uuid v4.2.0+incompatible // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
-	github.com/hashicorp/go-memdb v1.3.3 // indirect
+	github.com/hashicorp/go-memdb v1.3.4 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -71,7 +71,7 @@ require (
 	github.com/shurcooL/httpgzip v0.0.0-20190720172056-320755c1c1b0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggest/form/v5 v5.0.2 // indirect
-	github.com/swaggest/openapi-go v0.2.26 // indirect
+	github.com/swaggest/openapi-go v0.2.28 // indirect
 	github.com/swaggest/refl v1.1.0 // indirect
 	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect
 	github.com/vearutop/dynhist-go v1.1.0 // indirect
