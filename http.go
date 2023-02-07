@@ -11,7 +11,8 @@ import (
 	"github.com/bool64/prom-stats"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/swaggest/rest/web"
-	swgui "github.com/swaggest/swgui/v4emb"
+	"github.com/swaggest/swgui"
+	swgv4 "github.com/swaggest/swgui/v4emb"
 )
 
 // NewBaseWebService initializes default http router.
@@ -31,7 +32,18 @@ func NewBaseWebService(l *BaseLocator) *web.Service {
 	}
 
 	// Swagger UI endpoint at /docs.
-	r.Docs("/docs", swgui.New)
+	r.Docs("/docs", func(title, schemaURL, basePath string) http.Handler {
+		cfg := swgui.Config{}
+		cfg.Title = title
+		cfg.BasePath = basePath
+		cfg.SwaggerJSON = schemaURL
+
+		for _, o := range l.SwaggerUIOptions {
+			o(&cfg)
+		}
+
+		return swgv4.NewHandlerWithConfig(cfg)
+	})
 
 	return r
 }

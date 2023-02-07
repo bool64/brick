@@ -84,11 +84,6 @@ func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []stri
 		statement string,
 		args []driver.NamedValue,
 	) (nCtx context.Context, onFinish func(error)) {
-		// Exec and Query with args is upgraded to prepared statement.
-		if len(args) != 0 && (operation == dbwrap.Exec || operation == dbwrap.Query) {
-			return ctx, nil
-		}
-
 		// Closest caller in the stack with package not equal to listed and to "database/sql".
 		caller := dbwrap.Caller(skipPackages...)
 
