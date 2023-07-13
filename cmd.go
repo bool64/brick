@@ -22,6 +22,9 @@ type StartOptions struct {
 	// it can be used to override defaults via env vars.
 	EnvPrepare func() error
 
+	// NoHTTP instructs application to exit instead of starting HTTP server.
+	NoHTTP bool
+
 	// OnHTTPStart is called after the HTTP server is started.
 	OnHTTPStart func(addr string)
 }
@@ -61,18 +64,22 @@ func Start(cfg WithBaseConfig, init func(docsMode bool) (*BaseLocator, http.Hand
 
 	loc, router := init(false)
 
-	addr, err := loc.StartHTTPServer(router)
-	if err != nil {
-		loc.CtxdLogger().Error(context.Background(), "failed to start http server: %v", "error", err)
-		os.Exit(1)
+	if !opt.NoHTTP {
+		addr, err := loc.StartHTTPServer(router)
+		if err != nil {
+			loc.CtxdLogger().Error(context.Background(), "failed to start http server: %v", "error", err)
+			os.Exit(1)
+		}
+
+		if opt.OnHTTPStart != nil {
+			opt.OnHTTPStart(addr)
+		}
+	} else {
+		loc.Shutdown()
 	}
 
-	if opt.OnHTTPStart != nil {
-		opt.OnHTTPStart(addr)
-	}
-
-	// Wait for service loc termination finished.
-	err = <-loc.Wait()
+	// Wait for service locator termination finished.
+	err := <-loc.Wait()
 	if err != nil {
 		loc.CtxdLogger().Error(context.Background(), err.Error())
 	}
