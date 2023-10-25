@@ -19,6 +19,7 @@ import (
 	"github.com/bool64/zapctxd"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
+	"github.com/swaggest/openapi-go/openapi3"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/web"
@@ -31,7 +32,7 @@ import (
 func NoOpLocator() *BaseLocator {
 	bl := &BaseLocator{}
 
-	bl.OpenAPI = &openapi.Collector{}
+	bl.OpenAPI = openapi.NewCollector(openapi3.NewReflector())
 
 	ver := version.Info()
 	spec := bl.OpenAPI.Reflector().SpecEns()
@@ -46,15 +47,13 @@ func NoOpLocator() *BaseLocator {
 		bl.OpenAPI.Reflector().SpecEns().Info.WithMapOfAnythingItem("x-rev", ver.Revision)
 	}
 
-	bl.HTTPServiceOptions = append(bl.HTTPServiceOptions, func(s *web.Service, initialized bool) {
-		if !initialized {
-			s.OpenAPI = bl.OpenAPI.Reflector().Spec
-			s.OpenAPICollector = bl.OpenAPI
-		}
+	bl.HTTPServiceOptions = append(bl.HTTPServiceOptions, func(s *web.Service) {
+		s.OpenAPICollector = bl.OpenAPI
 	})
 
 	bl.LoggerProvider = ctxd.NoOpLogger{}
 	bl.TrackerProvider = stats.NoOp{}
+	bl.cacheInvalidationIndex = cache.NewInvalidationIndex()
 
 	return bl
 }
@@ -95,10 +94,8 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		ExposePanic: cfg.Debug.ExposePanic,
 	}.Middleware()
 
-	l.HTTPServiceOptions = append(l.HTTPServiceOptions, func(s *web.Service, initialized bool) {
-		if !initialized {
-			s.PanicRecoveryMiddleware = l.HTTPRecoveryMiddleware
-		}
+	l.HTTPServiceOptions = append(l.HTTPServiceOptions, func(s *web.Service) {
+		s.PanicRecoveryMiddleware = l.HTTPRecoveryMiddleware
 	})
 
 	l.HTTPServerMiddlewares = append(l.HTTPServerMiddlewares,
@@ -107,9 +104,11 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		nethttp.UseCaseMiddlewares(l.UseCaseMiddlewares...),   // Use case middlewares.
 	)
 
-	l.CacheTransfer = &cache.HTTPTransfer{
+	l.cacheTransfer = &cache.HTTPTransfer{
 		Logger: l.CtxdLogger(),
 	}
+
+	l.cacheInvalidationIndex = cache.NewInvalidationIndex()
 
 	if err := setupPrometheus(l); err != nil {
 		return l, err

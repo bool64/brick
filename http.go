@@ -10,15 +10,16 @@ import (
 
 	"github.com/bool64/prom-stats"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/swaggest/openapi-go/openapi3"
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/swgui"
-	swgv4 "github.com/swaggest/swgui/v4emb"
+	swgv5 "github.com/swaggest/swgui/v5cdn"
 )
 
 // NewBaseWebService initializes default http router.
 func NewBaseWebService(l *BaseLocator) *web.Service {
 	// Create router.
-	r := web.DefaultService(l.HTTPServiceOptions...)
+	r := web.NewService(openapi3.NewReflector(), l.HTTPServiceOptions...)
 
 	// Setup middlewares.
 	r.Wrap(l.HTTPServerMiddlewares...)
@@ -42,7 +43,7 @@ func NewBaseWebService(l *BaseLocator) *web.Service {
 			o(&cfg)
 		}
 
-		return swgv4.NewHandlerWithConfig(cfg)
+		return swgv5.NewHandlerWithConfig(cfg)
 	})
 
 	return r

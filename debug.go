@@ -66,11 +66,11 @@ func (l *BaseLocator) SetupDebugRouter() {
 		dr.Mount("/logz", logzpage.Handler(lz.LevelObservers()...))
 	}
 
-	if l.CacheTransfer != nil && l.CacheTransfer.CachesCount() > 0 {
+	if l.cacheTransfer != nil && l.cacheTransfer.CachesCount() > 0 {
 		dr.AddLink("export-cache", "Export Cache As JSONL")
 		dr.AddLink("transfer-cache", "Transfer Cache")
-		dr.Method(http.MethodGet, "/export-cache", l.CacheTransfer.ExportJSONL())
-		dr.Method(http.MethodGet, "/transfer-cache", l.CacheTransfer.Export())
+		dr.Method(http.MethodGet, "/export-cache", l.cacheTransfer.ExportJSONL())
+		dr.Method(http.MethodGet, "/transfer-cache", l.cacheTransfer.Export())
 	}
 
 	dr.AddLink("docs", "API Docs")

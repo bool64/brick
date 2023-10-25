@@ -32,6 +32,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggest/assertjson v1.9.0
 	github.com/swaggest/jsonschema-go v0.3.62
+	github.com/swaggest/openapi-go v0.2.41
 	github.com/swaggest/rest v0.2.58
 	github.com/swaggest/swgui v1.7.4
 	github.com/swaggest/usecase v1.2.1
@@ -72,7 +73,6 @@ require (
 	github.com/shurcooL/httpgzip v0.0.0-20190720172056-320755c1c1b0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
-	github.com/swaggest/openapi-go v0.2.41 // indirect
 	github.com/swaggest/refl v1.3.0 // indirect
 	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect
 	github.com/vearutop/dynhist-go v1.2.3 // indirect
