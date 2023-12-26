@@ -22,8 +22,6 @@ linters-settings:
 linters:
   enable-all: true
   disable:
-    - depguard
-    - tagalign
     - lll
     - maligned
     - gochecknoglobals
@@ -49,6 +47,8 @@ linters:
     - deadcode
     - testableexamples
     - dupword
+    - depguard
+    - tagalign
 
 issues:
   exclude-use-default: false
