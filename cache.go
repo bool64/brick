@@ -7,19 +7,25 @@ import (
 	"time"
 
 	"github.com/bool64/cache"
+	"github.com/bool64/ctxd"
+	"github.com/bool64/stats"
 )
 
 // TransferCache performs cache transfer.
 func (l *BaseLocator) TransferCache(ctx context.Context) error {
-	if l.BaseConfig.CacheTransferURL == "" || l.CacheTransfer.CachesCount() == 0 {
+	if l.BaseConfig.CacheTransferURL == "" || l.cacheTransfer.CachesCount() == 0 {
 		return nil
 	}
 
-	return l.CacheTransfer.Import(ctx, l.BaseConfig.CacheTransferURL)
+	return l.cacheTransfer.Import(ctx, l.BaseConfig.CacheTransferURL)
 }
 
 // MakeCacheOf creates an instance of failover cache and adds it to cache transfer.
-func MakeCacheOf[V any](l *BaseLocator, name string, ttl time.Duration, options ...func(cfg *cache.FailoverConfigOf[V])) *cache.FailoverOf[V] {
+func MakeCacheOf[V any](l interface {
+	StatsTracker() stats.Tracker
+	CtxdLogger() ctxd.Logger
+}, name string, ttl time.Duration, options ...func(cfg *cache.FailoverConfigOf[V]),
+) *cache.FailoverOf[V] {
 	cfg := cache.FailoverConfigOf[V]{}
 	cfg.Name = name
 	cfg.Stats = l.StatsTracker()
@@ -38,13 +44,25 @@ func MakeCacheOf[V any](l *BaseLocator, name string, ttl time.Duration, options 
 		})
 	}
 
-	greetingsCache := cache.NewFailoverOf[V](func(c *cache.FailoverConfigOf[V]) {
+	fc := cache.NewFailoverOf[V](func(c *cache.FailoverConfigOf[V]) {
 		*c = cfg
 	})
 
-	if w, ok := cfg.Backend.(cache.WalkDumpRestorer); ok {
-		l.CacheTransfer.AddCache(name, w)
+	if l, ok := l.(interface {
+		CacheTransfer() *cache.HTTPTransfer
+	}); ok {
+		if w, ok := cfg.Backend.(cache.WalkDumpRestorer); ok {
+			l.CacheTransfer().AddCache(name, w)
+		}
 	}
 
-	return greetingsCache
+	if l, ok := l.(interface {
+		CacheInvalidationIndex() *cache.InvalidationIndex
+	}); ok {
+		if d, ok := cfg.Backend.(cache.Deleter); ok {
+			l.CacheInvalidationIndex().AddCache(name, d)
+		}
+	}
+
+	return fc
 }

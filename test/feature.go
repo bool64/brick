@@ -38,13 +38,13 @@ func newContext(t *testing.T) *Context {
 	tc := &Context{}
 	tc.Local = httpsteps.NewLocalClient("", func(client *httpmock.Client) {
 		client.OnBodyMismatch = func(data []byte) {
-			assert.NoError(t, os.WriteFile("_last_mismatch.json", data, 0o600))
+			require.NoError(t, os.WriteFile("_last_mismatch.json", data, 0o600))
 		}
 	})
-	tc.Local.Vars = vars
+	tc.Local.VS.JSONComparer.Vars = vars
 
 	tc.External = httpsteps.NewExternalServer()
-	tc.External.Vars = vars
+	tc.External.VS.JSONComparer.Vars = vars
 
 	tc.Database = dbsteps.NewManager()
 	tc.Database.Vars = vars

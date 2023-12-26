@@ -28,12 +28,23 @@ type BaseLocator struct {
 
 	// HTTPServiceOptions can be used to configure low-level middlewares like middleware.StripSlashes on an
 	// initialized web.Service.
-	HTTPServiceOptions     []func(s *web.Service, initialized bool)
+	HTTPServiceOptions     []func(s *web.Service)
 	HTTPRecoveryMiddleware func(h http.Handler) http.Handler
 	HTTPServerMiddlewares  []func(h http.Handler) http.Handler
 	OpenAPI                *openapi.Collector
 	SwaggerUIOptions       []func(cfg *swgui.Config)
 
-	Storage       *sqluct.Storage
-	CacheTransfer *cache.HTTPTransfer
+	Storage                *sqluct.Storage
+	cacheTransfer          *cache.HTTPTransfer
+	cacheInvalidationIndex *cache.InvalidationIndex
+}
+
+// CacheTransfer provides a shared instance of cache transfer over HTTP.
+func (l *BaseLocator) CacheTransfer() *cache.HTTPTransfer {
+	return l.cacheTransfer
+}
+
+// CacheInvalidationIndex returns cache invalidation index.
+func (l *BaseLocator) CacheInvalidationIndex() *cache.InvalidationIndex {
+	return l.cacheInvalidationIndex
 }

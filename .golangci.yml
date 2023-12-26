@@ -47,11 +47,14 @@ linters:
     - deadcode
     - testableexamples
     - dupword
+    - depguard
+    - tagalign
 
 issues:
   exclude-use-default: false
   exclude-rules:
     - linters:
+        - testifylint
         - gomnd
         - goconst
         - goerr113

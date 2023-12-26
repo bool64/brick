@@ -7,10 +7,10 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/bool64/cache v0.4.6
+	github.com/bool64/cache v0.4.7
 	github.com/bool64/ctxd v1.2.1
 	github.com/bool64/dbwrap v0.1.3
-	github.com/bool64/dev v0.2.31
+	github.com/bool64/dev v0.2.33
 	github.com/bool64/godogx v0.1.1
 	github.com/bool64/httpmock v0.1.13
 	github.com/bool64/logz v1.2.0
@@ -20,7 +20,7 @@ require (
 	github.com/bool64/stats v0.2.2
 	github.com/bool64/zapctxd v1.1.0
 	github.com/cucumber/godog v0.13.0
-	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-chi/chi/v5 v5.0.11
 	github.com/godogx/allure v0.2.3
 	github.com/godogx/dbsteps v0.1.2
 	github.com/godogx/httpsteps v0.2.13
@@ -31,10 +31,11 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggest/assertjson v1.9.0
-	github.com/swaggest/jsonschema-go v0.3.62
-	github.com/swaggest/rest v0.2.58
-	github.com/swaggest/swgui v1.7.4
-	github.com/swaggest/usecase v1.2.1
+	github.com/swaggest/jsonschema-go v0.3.64
+	github.com/swaggest/openapi-go v0.2.44
+	github.com/swaggest/rest v0.2.60
+	github.com/swaggest/swgui v1.7.5
+	github.com/swaggest/usecase v1.3.1
 	github.com/vearutop/gooselite v0.1.1
 	go.opencensus.io v0.24.0
 	go.uber.org/zap v1.26.0
@@ -72,7 +73,6 @@ require (
 	github.com/shurcooL/httpgzip v0.0.0-20190720172056-320755c1c1b0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
-	github.com/swaggest/openapi-go v0.2.41 // indirect
 	github.com/swaggest/refl v1.3.0 // indirect
 	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect
 	github.com/vearutop/dynhist-go v1.2.3 // indirect
@@ -82,10 +82,10 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.10.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/api v0.30.0 // indirect
 	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987 // indirect
 	google.golang.org/grpc v1.33.2 // indirect
