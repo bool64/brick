@@ -1,6 +1,10 @@
 package debug
 
-import "context"
+import (
+	"context"
+
+	"github.com/go-chi/chi/v5"
+)
 
 // Config keeps debug settings.
 type Config struct {
@@ -24,4 +28,6 @@ type Config struct {
 	ExposePanic bool `split_words:"true"`
 
 	OnPanic []func(ctx context.Context, rcv interface{}, stack []byte) `json:"-" ignored:"true"`
+
+	Middlewares chi.Middlewares `envconfig:"-" json:"-"`
 }

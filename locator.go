@@ -39,10 +39,12 @@ type BaseLocator struct {
 	cacheInvalidationIndex *cache.InvalidationIndex
 }
 
+// CacheTransfer provides a shared instance of cache transfer over HTTP.
 func (l *BaseLocator) CacheTransfer() *cache.HTTPTransfer {
 	return l.cacheTransfer
 }
 
+// CacheInvalidationIndex returns cache invalidation index.
 func (l *BaseLocator) CacheInvalidationIndex() *cache.InvalidationIndex {
 	return l.cacheInvalidationIndex
 }

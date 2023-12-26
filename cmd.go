@@ -30,7 +30,7 @@ type StartOptions struct {
 }
 
 // Start loads config and runs application with provided service locator and http router.
-func Start(cfg WithBaseConfig, init func(docsMode bool) (*BaseLocator, http.Handler), options ...func(o *StartOptions)) {
+func Start(cfg WithBaseConfig, init func(docsMode bool) (*BaseLocator, http.Handler), options ...func(o *StartOptions)) { //nolint:cyclop
 	ver := flag.Bool("version", false, "Print application version and exit.")
 	docs := flag.Bool("openapi", false, "Print application OpenAPI spec and exit.")
 	confFile := flag.String("conf", "", "Config file with ENV variables to load.")

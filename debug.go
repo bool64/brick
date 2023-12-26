@@ -27,6 +27,8 @@ func MountDevPortal(r chi.Router, l *BaseLocator) {
 			r.Use(middleware.BasicAuth("Developer Access", map[string]string{"dev": cfg.Debug.DevPassword}))
 		}
 
+		r.Use(cfg.Debug.Middlewares...)
+
 		l.SetupDebugRouter()
 		r.Mount("/", l.DebugRouter)
 	})

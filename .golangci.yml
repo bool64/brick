@@ -22,6 +22,8 @@ linters-settings:
 linters:
   enable-all: true
   disable:
+    - depguard
+    - tagalign
     - lll
     - maligned
     - gochecknoglobals
@@ -52,6 +54,7 @@ issues:
   exclude-use-default: false
   exclude-rules:
     - linters:
+        - testifylint
         - gomnd
         - goconst
         - goerr113

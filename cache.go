@@ -54,7 +54,6 @@ func MakeCacheOf[V any](l interface {
 		if w, ok := cfg.Backend.(cache.WalkDumpRestorer); ok {
 			l.CacheTransfer().AddCache(name, w)
 		}
-
 	}
 
 	if l, ok := l.(interface {
