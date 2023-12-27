@@ -133,8 +133,7 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 				fields.HTTPMethod, r.Method,
 			)
 
-			logger.Info(ctx, "http request started")
-			logger.Debug(ctx, "http request headers", "headers", headersMap(r.Header))
+			logger.Debug(ctx, "http request started", "headers", headersMap(r.Header))
 
 			w := middleware.NewWrapResponseWriter(rw, r.ProtoMajor)
 			start := time.Now()
@@ -148,8 +147,7 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 				"elapsed_ms", float64(elapsed.Nanoseconds())/1000000.0,
 			)
 
-			logger.Debug(ctx, "http response headers", "headers", headersMap(w.Header()))
-			logger.Info(ctx, "http request complete")
+			logger.Debug(ctx, "http request complete", "resp_headers", headersMap(w.Header()))
 		})
 	}
 }

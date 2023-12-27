@@ -74,8 +74,7 @@ func TestNewBaseLocator(t *testing.T) {
 	assert.Equal(t, `{"error":"request panicked"}`+"\n", rw.Body.String())
 
 	logs := "[" + strings.ReplaceAll(log.String(), "\n", ",\n") + "{}]"
-	assertjson.Equal(t, []byte(`[{"level":"info","@timestamp":"<ignore-diff>","message":"http request started","client.ip":"","user_agent.original":"","url.original":"/test/something-public","http.request.method":"GET"},
-        	            	{"level":"error","@timestamp":"<ignore-diff>","message":"request panicked","panic":"oops","stack":"<ignore-diff>","client.ip":"","user_agent.original":"","url.original":"/test/something-public","http.request.method":"GET"},
+	assertjson.Equal(t, []byte(`[{"level":"error","@timestamp":"<ignore-diff>","message":"request panicked","panic":"oops","stack":"<ignore-diff>","client.ip":"","user_agent.original":"","url.original":"/test/something-public","http.request.method":"GET"},
         	            	{}]`), []byte(logs), logs)
 
 	l.Shutdown()
