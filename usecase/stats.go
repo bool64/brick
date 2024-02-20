@@ -22,6 +22,7 @@ func StatsMiddleware(tracker stats.Tracker) usecase.Middleware {
 
 			name string
 		)
+
 		if usecase.As(u, &withName) {
 			name = withName.Name()
 		}

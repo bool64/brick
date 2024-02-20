@@ -61,7 +61,7 @@ func wrapOptions(logger ctxd.Logger, statsTracker stats.Tracker) []dbwrap.Option
 
 	return []dbwrap.Option{
 		// This interceptor enables reverse debugging from DB side.
-		dbwrap.WithInterceptor(func(ctx context.Context, operation dbwrap.Operation, statement string, args []driver.NamedValue) (context.Context, string, []driver.NamedValue) {
+		dbwrap.WithInterceptor(func(ctx context.Context, _ dbwrap.Operation, statement string, args []driver.NamedValue) (context.Context, string, []driver.NamedValue) {
 			// Closest caller in the stack with package not equal to listed and to "database/sql".
 			caller := dbwrap.Caller(skipPackages...)
 

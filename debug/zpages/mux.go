@@ -76,6 +76,7 @@ func Mux(prefix string, traceToURL func(traceID string) string) http.Handler {
 		// hijacking css
 		if req.RequestURI == prefix+"/public/opencensus.css" {
 			rw.Header().Set("Content-Type", "text/css; charset=utf-8")
+
 			_, err := rw.Write([]byte(css))
 			if err != nil {
 				panic(err)

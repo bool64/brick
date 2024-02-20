@@ -55,7 +55,7 @@ func TestNewBaseLocator(t *testing.T) {
 	r := brick.NewBaseWebService(l)
 	serviceURLPrefix := "/" + cfg.ServiceName
 
-	uc := usecase.NewIOI(nil, nil, func(ctx context.Context, input, output interface{}) error {
+	uc := usecase.NewIOI(nil, nil, func(_ context.Context, _, _ interface{}) error {
 		panic("oops")
 	})
 

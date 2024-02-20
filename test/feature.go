@@ -15,6 +15,7 @@ import (
 	"github.com/godogx/allure"
 	"github.com/godogx/dbsteps"
 	"github.com/godogx/httpsteps"
+	"github.com/godogx/vars"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,6 +23,7 @@ import (
 // Context is a test context for feature tests.
 type Context struct {
 	Vars                *shared.Vars
+	VS                  *vars.Steps
 	Local               *httpsteps.LocalClient
 	External            *httpsteps.ExternalServer
 	Database            *dbsteps.Manager
@@ -33,7 +35,8 @@ type Context struct {
 func newContext(t *testing.T) *Context {
 	t.Helper()
 
-	vars := &shared.Vars{}
+	vs := &vars.Steps{}
+	vs.JSONComparer.Vars = &shared.Vars{}
 
 	tc := &Context{}
 	tc.Local = httpsteps.NewLocalClient("", func(client *httpmock.Client) {
@@ -41,13 +44,16 @@ func newContext(t *testing.T) *Context {
 			require.NoError(t, os.WriteFile("_last_mismatch.json", data, 0o600))
 		}
 	})
-	tc.Local.VS.JSONComparer.Vars = vars
+	tc.Local.VS = vs
 
 	tc.External = httpsteps.NewExternalServer()
-	tc.External.VS.JSONComparer.Vars = vars
+	tc.External.VS = vs
 
 	tc.Database = dbsteps.NewManager()
-	tc.Database.Vars = vars
+	tc.Database.Vars = vs.JSONComparer.Vars
+
+	tc.VS = vs
+	tc.Vars = vs.JSONComparer.Vars
 
 	return tc
 }
@@ -98,6 +104,7 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 			tc.Local.RegisterSteps(s)
 			tc.External.RegisterSteps(s)
 			tc.Database.RegisterSteps(s)
+			tc.VS.Register(s)
 
 			if tc.ScenarioInitializer != nil {
 				tc.ScenarioInitializer(s)
