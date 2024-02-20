@@ -18,6 +18,7 @@ import (
 	"github.com/godogx/vars"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/swaggest/assertjson"
 )
 
 // Context is a test context for feature tests.
@@ -36,7 +37,9 @@ func newContext(t *testing.T) *Context {
 	t.Helper()
 
 	vs := &vars.Steps{}
+
 	vs.JSONComparer.Vars = &shared.Vars{}
+	vs.JSONComparer.IgnoreDiff = assertjson.IgnoreDiff
 
 	tc := &Context{}
 	tc.Local = httpsteps.NewLocalClient("", func(client *httpmock.Client) {
