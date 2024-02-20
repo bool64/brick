@@ -20,10 +20,10 @@ import (
 //	)
 //	defer finish(&err)
 func AddSpan(ctx context.Context, attributes ...trace.Attribute) (context.Context, func(*error)) {
-	ctx, span := trace.StartSpan(ctx, runtime.CallerFunc(2))
+	ctx, span := trace.StartSpan(ctx, runtime.CallerFunc(2)) //nolint:spancheck
 	span.AddAttributes(attributes...)
 
-	return ctx, func(err *error) {
+	return ctx, func(err *error) { //nolint:spancheck
 		if err != nil && *err != nil {
 			e := *err
 			st := status.Unknown

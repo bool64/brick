@@ -19,6 +19,7 @@ func UsecaseErrors(logger ctxd.Logger) usecase.Middleware {
 
 			name string
 		)
+
 		if usecase.As(u, &withName) {
 			name = withName.Name()
 		}

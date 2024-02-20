@@ -137,7 +137,9 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 
 			w := middleware.NewWrapResponseWriter(rw, r.ProtoMajor)
 			start := time.Now()
+
 			next.ServeHTTP(w, r)
+
 			elapsed := time.Since(start)
 
 			ctx = ctxd.AddFields(ctx,

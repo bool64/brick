@@ -29,8 +29,9 @@ func NewMux(prefix string) *Mux {
 	r := &Mux{Prefix: prefix}
 	r.Mux = debugRouter
 
-	r.Get("/", func(w http.ResponseWriter, req *http.Request) {
+	r.Get("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf8")
+
 		_, err := w.Write(r.body)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
