@@ -61,7 +61,19 @@ func newContext(t *testing.T) *Context {
 	return tc
 }
 
-var feature = flag.String("feature", "features", "Feature file to test.")
+var (
+	feature      = flag.String("feature", "features", "Feature file to test.")
+	godogOptions = godog.Options{
+		Format:        "pretty-failed",
+		Strict:        true,
+		Tags:          os.Getenv("GODOG_TAGS"),
+		StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
+	}
+)
+
+func init() {
+	godog.BindFlags("godog.", flag.CommandLine, &godogOptions)
+}
 
 // RunFeatures runs feature tests.
 func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init func(tc *Context) (*brick.BaseLocator, http.Handler)) {
@@ -87,14 +99,15 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 
 	godogx.RegisterPrettyFailedFormatter()
 
-	options := godog.Options{
-		Format:        "pretty-failed",
-		Strict:        true,
-		Paths:         []string{*feature},
-		Tags:          os.Getenv("GODOG_TAGS"),
-		StopOnFailure: os.Getenv("GODOG_STOP_ON_FAILURE") == "1",
-		TestingT:      t,
-		Concurrency:   tc.Concurrency,
+	options := godogOptions
+
+	options.TestingT = t
+	if options.Concurrency == 0 {
+		options.Concurrency = tc.Concurrency
+	}
+
+	if len(options.Paths) == 0 {
+		options.Paths = []string{*feature}
 	}
 
 	if tc.OptionsInitializer != nil {
