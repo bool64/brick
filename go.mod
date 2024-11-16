@@ -9,8 +9,8 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/bool64/cache v0.4.7
 	github.com/bool64/ctxd v1.2.1
-	github.com/bool64/dbwrap v0.1.3
-	github.com/bool64/dev v0.2.34
+	github.com/bool64/dbwrap v0.1.4
+	github.com/bool64/dev v0.2.36
 	github.com/bool64/godogx v0.1.1
 	github.com/bool64/httpmock v0.1.13
 	github.com/bool64/logz v1.3.0
