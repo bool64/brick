@@ -14,13 +14,13 @@ import (
 	"go.opencensus.io/trace"
 )
 
-// WithTracing instruments database connector with OpenCensus tracing.
-func WithTracing(dbConnector driver.Connector) driver.Connector {
+// withTracing instruments database connector with OpenCensus tracing.
+func withTracing(dbConnector driver.Connector) driver.Connector {
 	return ocsql.WrapConnector(dbConnector, tracingOptions()...)
 }
 
-// DriverNameWithTracing registers database driver name with OpenCensus tracing.
-func DriverNameWithTracing(driverName string) (string, error) {
+// driverNameWithTracing registers database driver name with OpenCensus tracing.
+func driverNameWithTracing(driverName string) (string, error) {
 	return ocsql.Register(driverName, tracingOptions()...)
 }
 
@@ -34,17 +34,17 @@ func tracingOptions() []ocsql.TraceOption {
 	}
 }
 
-// WithQueriesLogging instruments database connector with query logging.
-func WithQueriesLogging(dbConnector driver.Connector, logger ctxd.Logger, statsTracker stats.Tracker) driver.Connector {
-	return dbwrap.WrapConnector(dbConnector, wrapOptions(logger, statsTracker)...)
+// withQueriesLogging instruments database connector with query logging.
+func withQueriesLogging(cfg Config, dbConnector driver.Connector, logger ctxd.Logger, statsTracker stats.Tracker) driver.Connector {
+	return dbwrap.WrapConnector(dbConnector, wrapOptions(logger, statsTracker, cfg.MethodSkipPackages)...)
 }
 
-// DriverNameWithQueriesLogging registers database driver name with query logging.
-func DriverNameWithQueriesLogging(driverName string, logger ctxd.Logger, statsTracker stats.Tracker) (string, error) {
-	return dbwrap.Register(driverName, wrapOptions(logger, statsTracker)...)
+// driverNameWithQueriesLogging registers database driver name with query logging.
+func driverNameWithQueriesLogging(cfg Config, driverName string, logger ctxd.Logger, statsTracker stats.Tracker) (string, error) {
+	return dbwrap.Register(driverName, wrapOptions(logger, statsTracker, cfg.MethodSkipPackages)...)
 }
 
-func wrapOptions(logger ctxd.Logger, statsTracker stats.Tracker) []dbwrap.Option {
+func wrapOptions(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []string) []dbwrap.Option {
 	if logger == nil {
 		logger = ctxd.NoOpLogger{}
 	}
@@ -53,11 +53,11 @@ func wrapOptions(logger ctxd.Logger, statsTracker stats.Tracker) []dbwrap.Option
 		statsTracker = stats.NoOp{}
 	}
 
-	skipPackages := []string{
+	skipPackages = append([]string{
 		"github.com/Masterminds/squirrel",
 		"github.com/bool64/sqluct",
 		"github.com/jmoiron/sqlx",
-	}
+	}, skipPackages...)
 
 	return []dbwrap.Option{
 		// This interceptor enables reverse debugging from DB side.
@@ -70,7 +70,7 @@ func wrapOptions(logger ctxd.Logger, statsTracker stats.Tracker) []dbwrap.Option
 		}),
 
 		// This option limits middleware applicability.
-		dbwrap.WithOperations(dbwrap.Query, dbwrap.StmtQuery, dbwrap.Exec, dbwrap.StmtExec),
+		dbwrap.WithOperations(dbwrap.Query, dbwrap.StmtQuery, dbwrap.Exec, dbwrap.StmtExec, dbwrap.RowsClose),
 
 		// This middleware logs statements with arguments at DEBUG level and counts stats.
 		dbwrap.WithMiddleware(observe(logger, statsTracker, skipPackages)),
@@ -86,6 +86,11 @@ func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []stri
 	) (nCtx context.Context, onFinish func(error)) {
 		// Closest caller in the stack with package not equal to listed and to "database/sql".
 		caller := dbwrap.Caller(skipPackages...)
+
+		if operation == dbwrap.RowsClose {
+			statsTracker.Add(ctx, "sql_storage_rows_close", 1, "method", caller)
+			return
+		}
 
 		ctx, span := trace.StartSpan(ctx, caller+":"+string(operation))
 		span.AddAttributes(

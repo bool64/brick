@@ -11,4 +11,8 @@ type Config struct {
 	MaxOpen         int           `split_words:"true" default:"5"`
 	InitConn        bool          `split_words:"true"`
 	ApplyMigrations bool          `split_words:"true"`
+
+	// MethodSkipPackages provides helper package paths to skip when identifying method name for observability.
+	// Item example: "github.com/jmoiron/sqlx".
+	MethodSkipPackages []string
 }

@@ -20,8 +20,8 @@ import (
 
 // SetupStorage initializes database pool and prepares storage.
 func SetupStorage(cfg Config, logger ctxd.Logger, statsTracker stats.Tracker, conn driver.Connector, migrations fs.FS) (*sqluct.Storage, error) {
-	conn = WithTracing(conn)
-	conn = WithQueriesLogging(conn, logger, statsTracker)
+	conn = withTracing(conn)
+	conn = withQueriesLogging(cfg, conn, logger, statsTracker)
 
 	db := sql.OpenDB(conn)
 
@@ -30,12 +30,12 @@ func SetupStorage(cfg Config, logger ctxd.Logger, statsTracker stats.Tracker, co
 
 // SetupStorageDSN initializes database pool and prepares storage.
 func SetupStorageDSN(cfg Config, logger ctxd.Logger, statsTracker stats.Tracker, migrations fs.FS) (*sqluct.Storage, error) {
-	wrapName, err := DriverNameWithTracing(cfg.DriverName)
+	wrapName, err := driverNameWithTracing(cfg.DriverName)
 	if err != nil {
 		return nil, err
 	}
 
-	wrapName, err = DriverNameWithQueriesLogging(wrapName, logger, statsTracker)
+	wrapName, err = driverNameWithQueriesLogging(cfg, wrapName, logger, statsTracker)
 	if err != nil {
 		return nil, err
 	}
