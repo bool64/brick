@@ -85,7 +85,7 @@ func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []stri
 		args []driver.NamedValue,
 	) (nCtx context.Context, onFinish func(error)) {
 		// Closest caller in the stack with package not equal to listed and to "database/sql".
-		caller := dbwrap.Caller(skipPackages...)
+		caller := dbwrap.CallerCtx(ctx, skipPackages...)
 
 		if operation == dbwrap.RowsClose {
 			statsTracker.Add(ctx, "sql_storage_rows_close", 1, "method", caller)
