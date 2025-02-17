@@ -89,7 +89,8 @@ func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []stri
 
 		if operation == dbwrap.RowsClose {
 			statsTracker.Add(ctx, "sql_storage_rows_close", 1, "method", caller)
-			return
+
+			return nil, nil
 		}
 
 		ctx, span := trace.StartSpan(ctx, caller+":"+string(operation))

@@ -22,9 +22,9 @@ func TestLoad(t *testing.T) {
 		Baz bool
 	}{}
 
-	require.NoError(t, os.Setenv("TEST_ENVIRONMENT", "test"))
+	t.Setenv("TEST_ENVIRONMENT", "test")
 	assert.EqualError(t, config.Load("TEST", &cfg), "validate: I[#/Bar] S[#/properties/Bar/minimum] must be >= 500/1 but found 321")
-	require.NoError(t, os.Setenv("TEST_BAR", "600"))
+	t.Setenv("TEST_BAR", "600")
 	assert.NoError(t, config.Load("TEST", &cfg))
 
 	assert.Equal(t, 600, cfg.Bar)
