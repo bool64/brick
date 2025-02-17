@@ -74,8 +74,8 @@ github.com/bool64/dev v0.1.38/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2z
 github.com/bool64/dev v0.2.4/go.mod h1:cTHiTDNc8EewrQPy3p1obNilpMpdmlUesDkFTF2zRWU=
 github.com/bool64/dev v0.2.25/go.mod h1:iJbh1y/HkunEPhgebWRNcs8wfGq7sjvJ6W5iabL8ACg=
 github.com/bool64/dev v0.2.36/go.mod h1:iJbh1y/HkunEPhgebWRNcs8wfGq7sjvJ6W5iabL8ACg=
-github.com/bool64/dev v0.2.38 h1:C5H9wkx/BhTYRfV14X90iIQKpSuhzsG+OHQvWdQ5YQ4=
-github.com/bool64/dev v0.2.38/go.mod h1:iJbh1y/HkunEPhgebWRNcs8wfGq7sjvJ6W5iabL8ACg=
+github.com/bool64/dev v0.2.39 h1:kP8DnMGlWXhGYJEZE/J0l/gVBdbuhoPGL+MJG4QbofE=
+github.com/bool64/dev v0.2.39/go.mod h1:iJbh1y/HkunEPhgebWRNcs8wfGq7sjvJ6W5iabL8ACg=
 github.com/bool64/godogx v0.1.1 h1:iAwnix6HQgl7A5BAJ4mMvWbhR721GHNxeAAKFEjrWO4=
 github.com/bool64/godogx v0.1.1/go.mod h1:qydmzRfimgYTmNEvpnc+SJNkmdjpPoPavYQoSn2rjoY=
 github.com/bool64/httpmock v0.1.15 h1:PWvuqpew/FEigT7cvv03/t9G+UeE3wD2QP8PVyBBUwc=
