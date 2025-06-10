@@ -35,7 +35,7 @@ require (
 	github.com/swaggest/jsonschema-go v0.3.73
 	github.com/swaggest/openapi-go v0.2.55
 	github.com/swaggest/rest v0.2.72
-	github.com/swaggest/swgui v1.8.2
+	github.com/swaggest/swgui v1.8.4
 	github.com/swaggest/usecase v1.3.1
 	github.com/vearutop/gooselite v0.1.1
 	go.opencensus.io v0.24.0
@@ -70,7 +70,6 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/prometheus/statsd_exporter v0.22.8 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
-	github.com/shurcooL/httpgzip v0.0.0-20190720172056-320755c1c1b0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
 	github.com/swaggest/refl v1.3.0 // indirect
@@ -82,10 +81,8 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
 	google.golang.org/api v0.221.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b // indirect
 	google.golang.org/grpc v1.70.0 // indirect
