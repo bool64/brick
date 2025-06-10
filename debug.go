@@ -13,7 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	v3 "github.com/swaggest/swgui/v3"
+	swg "github.com/swaggest/swgui/v5cdn"
 )
 
 // MountDevPortal mounts debug handlers to router.
@@ -77,7 +77,7 @@ func (l *BaseLocator) SetupDebugRouter() {
 
 	dr.AddLink("docs", "API Docs")
 	dr.Method(http.MethodGet, "/docs/openapi.json", l.OpenAPI)
-	dr.Mount("/docs", v3.NewHandler(l.OpenAPI.Reflector().SpecEns().Info.Title,
+	dr.Mount("/docs", swg.NewHandler(l.OpenAPI.Reflector().SpecEns().Info.Title,
 		prefix+"/docs/openapi.json", prefix+"/docs"))
 
 	l.DebugRouter = dr
