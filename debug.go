@@ -6,6 +6,7 @@ import (
 
 	"github.com/bool64/brick/debug"
 	"github.com/bool64/brick/debug/zpages"
+	"github.com/bool64/brick/telemetry"
 	"github.com/bool64/dev/version"
 	"github.com/bool64/logz/ctxz"
 	"github.com/bool64/logz/logzpage"
@@ -67,7 +68,7 @@ func newDebugRouter(l *BaseLocator, tracezProcessor *otelzpages.SpanProcessor) *
 
 	if pt, ok := l.StatsTracker().(*prom.Tracker); ok {
 		dr.AddLink("metrics", "Metrics")
-		dr.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(pt.PrometheusRegistry(), promhttp.HandlerOpts{}))
+		dr.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(telemetry.PrometheusGatherer(pt.PrometheusRegistry()), promhttp.HandlerOpts{}))
 	}
 
 	if lz, ok := l.CtxdLogger().(ctxz.Observer); ok {

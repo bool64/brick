@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/bool64/brick/telemetry"
 	"github.com/bool64/prom-stats"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/swaggest/openapi-go/openapi3"
@@ -25,7 +26,7 @@ func NewBaseWebService(l *BaseLocator) *web.Service {
 	r.Wrap(l.HTTPServerMiddlewares...)
 
 	if pt, ok := l.StatsTracker().(*prom.Tracker); ok {
-		r.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(pt.PrometheusRegistry(), promhttp.HandlerOpts{}))
+		r.Method(http.MethodGet, "/metrics", promhttp.HandlerFor(telemetry.PrometheusGatherer(pt.PrometheusRegistry()), promhttp.HandlerOpts{}))
 	}
 
 	if l.BaseConfig.Debug.DevTools {

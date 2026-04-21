@@ -3,9 +3,11 @@ package telemetry
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	bridgeprom "go.opentelemetry.io/contrib/bridges/prometheus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
@@ -15,19 +17,51 @@ import (
 // MetricsParams configure metrics provider setup.
 type MetricsParams struct {
 	Config     Config
-	Registerer prometheus.Registerer
+	Gatherer   prometheus.Gatherer
 	OnShutdown ShutdownRegistrar
+}
+
+var (
+	prometheusGathererMu sync.RWMutex
+	prometheusGatherer   prometheus.Gatherer
+)
+
+// PrometheusGatherer returns a gatherer that includes native Prometheus metrics and OTel metrics.
+func PrometheusGatherer(native prometheus.Gatherer) prometheus.Gatherer {
+	prometheusGathererMu.RLock()
+	otelGatherer := prometheusGatherer
+	prometheusGathererMu.RUnlock()
+
+	switch {
+	case native == nil:
+		return otelGatherer
+	case otelGatherer == nil:
+		return native
+	default:
+		return prometheus.Gatherers{native, otelGatherer}
+	}
 }
 
 // SetupMetrics configures the global OTel meter provider with Prometheus and optional OTLP readers.
 func SetupMetrics(p MetricsParams) error {
-	promExporter, err := otelprom.New(otelprom.WithRegisterer(p.Registerer))
+	otelRegistry := prometheus.NewRegistry()
+
+	promExporter, err := otelprom.New(otelprom.WithRegisterer(otelRegistry))
 	if err != nil {
 		return err
 	}
 
+	prometheusGathererMu.Lock()
+	prometheusGatherer = otelRegistry
+	prometheusGathererMu.Unlock()
+
 	readers := []metric.Option{metric.WithReader(promExporter)}
-	if reader, err := NewMetricsReader(p.Config); err != nil {
+	var producers []metric.Producer
+	if p.Gatherer != nil {
+		producers = append(producers, bridgeprom.NewMetricProducer(bridgeprom.WithGatherer(p.Gatherer)))
+	}
+
+	if reader, err := NewMetricsReader(p.Config, producers...); err != nil {
 		return err
 	} else if reader != nil {
 		readers = append(readers, metric.WithReader(reader))
@@ -38,6 +72,10 @@ func SetupMetrics(p MetricsParams) error {
 
 	if p.OnShutdown != nil {
 		p.OnShutdown("otel_meter_provider", func() {
+			prometheusGathererMu.Lock()
+			prometheusGatherer = nil
+			prometheusGathererMu.Unlock()
+
 			_ = meterProvider.Shutdown(context.Background())
 		})
 	}
@@ -46,7 +84,7 @@ func SetupMetrics(p MetricsParams) error {
 }
 
 // NewMetricsReader creates an OTLP metrics reader if metrics export is configured.
-func NewMetricsReader(cfg Config) (metric.Reader, error) {
+func NewMetricsReader(cfg Config, producers ...metric.Producer) (metric.Reader, error) {
 	if cfg.MetricEndpoint() == "" {
 		return nil, nil
 	}
@@ -69,5 +107,12 @@ func NewMetricsReader(cfg Config) (metric.Reader, error) {
 		interval = 15 * time.Second
 	}
 
-	return metric.NewPeriodicReader(exporter, metric.WithInterval(interval)), nil
+	readerOpts := []metric.PeriodicReaderOption{metric.WithInterval(interval)}
+	for _, producer := range producers {
+		if producer != nil {
+			readerOpts = append(readerOpts, metric.WithProducer(producer))
+		}
+	}
+
+	return metric.NewPeriodicReader(exporter, readerOpts...), nil
 }

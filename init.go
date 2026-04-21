@@ -135,7 +135,7 @@ func setupPrometheus(l *BaseLocator) error {
 
 	if err := telemetry.SetupMetrics(telemetry.MetricsParams{
 		Config:     l.BaseConfig.Telemetry,
-		Registerer: promReg,
+		Gatherer:   promReg,
 		OnShutdown: l.OnShutdown,
 	}); err != nil {
 		return err

@@ -376,6 +376,8 @@ go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ
 go.opentelemetry.io/auto/sdk v1.2.1/go.mod h1:KRTj+aOaElaLi+wW1kO/DZRXwkF4C5xPbEe3ZiIhN7Y=
 go.opentelemetry.io/contrib/bridges/otelslog v0.18.0 h1:hhPGP3zvvy1xWT9RTy970wlniSxFttBIsAK1gvMguJM=
 go.opentelemetry.io/contrib/bridges/otelslog v0.18.0/go.mod h1:twJF7inoMza6kxMcF8JOdL3mPmtOZu7GEr34CUNE6Dg=
+go.opentelemetry.io/contrib/bridges/prometheus v0.68.0 h1:w3zlHYETbDwXyWHZlyyR58ZC39XGi8rAhkBgUgJ9d5w=
+go.opentelemetry.io/contrib/bridges/prometheus v0.68.0/go.mod h1:GR/mClR2nn7vE8RLwxKjoBNg+QtgdDhRzxVa93koy5o=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0 h1:CqXxU8VOmDefoh0+ztfGaymYbhdB/tT3zs79QaZTNGY=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0/go.mod h1:BuhAPThV8PBHBvg8ZzZ/Ok3idOdhWIodywz2xEcRbJo=
 go.opentelemetry.io/contrib/zpages v0.68.0 h1:H5yrUwxPrbvhzdBxjQD+VXMtPjIBfp8NWNVvQT8E30M=
