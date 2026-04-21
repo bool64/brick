@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/XSAM/otelsql"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/sqluct"
 	"github.com/bool64/stats"
@@ -20,10 +21,9 @@ import (
 
 // SetupStorage initializes database pool and prepares storage.
 func SetupStorage(cfg Config, logger ctxd.Logger, statsTracker stats.Tracker, conn driver.Connector, migrations fs.FS) (*sqluct.Storage, error) {
-	conn = withTracing(conn)
 	conn = withQueriesLogging(cfg, conn, logger, statsTracker)
 
-	db := sql.OpenDB(conn)
+	db := otelsql.OpenDB(conn, tracingOptions()...)
 
 	return setupStorage(cfg, db, migrations, logger)
 }
@@ -52,6 +52,11 @@ func setupStorage(cfg Config, db *sql.DB, migrations fs.FS, logger ctxd.Logger) 
 	db.SetMaxIdleConns(cfg.MaxIdle)
 	db.SetMaxOpenConns(cfg.MaxOpen)
 	db.SetConnMaxLifetime(cfg.MaxLifetime)
+
+	// Export database/sql pool stats alongside query traces and operation metrics.
+	if _, err := otelsql.RegisterDBStatsMetrics(db, tracingOptions()...); err != nil {
+		return nil, fmt.Errorf("register db stats metrics: %w", err)
+	}
 
 	st := sqluct.NewStorage(sqlx.NewDb(db, cfg.DriverName))
 	st.Mapper = &sqluct.Mapper{}

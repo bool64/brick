@@ -8,7 +8,7 @@ import (
 
 // Config keeps debug settings.
 type Config struct {
-	// TraceSamplingProbability is probability of exporting of OpenCensus trace.
+	// TraceSamplingProbability is probability of sampling OpenTelemetry traces.
 	TraceSamplingProbability float64 `split_words:"true" default:"0.1"`
 
 	// TraceURL allows providing URL to {trace_id}, example http://jaeger.myservice.com/trace/{trace_id}.

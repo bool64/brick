@@ -14,6 +14,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swg "github.com/swaggest/swgui/v5cdn"
+	otelzpages "go.opentelemetry.io/contrib/zpages"
 )
 
 // MountDevPortal mounts debug handlers to router.
@@ -40,6 +41,10 @@ func (l *BaseLocator) SetupDebugRouter() {
 		return
 	}
 
+	l.DebugRouter = newDebugRouter(l, nil)
+}
+
+func newDebugRouter(l *BaseLocator, tracezProcessor *otelzpages.SpanProcessor) *debug.Mux {
 	cfg := l.BaseConfig
 
 	prefix := cfg.Debug.URL
@@ -50,12 +55,14 @@ func (l *BaseLocator) SetupDebugRouter() {
 
 	dr.AddLink("zpages/tracez", "Trace Spans")
 
-	if cfg.Debug.TraceURL != "" {
-		dr.Mount("/zpages", zpages.Mux(prefix+"/zpages", func(traceID string) string {
-			return strings.ReplaceAll(cfg.Debug.TraceURL, "{trace_id}", traceID)
-		}))
-	} else {
-		dr.Mount("/zpages", zpages.Mux(prefix+"/zpages", nil))
+	if tracezProcessor != nil {
+		if cfg.Debug.TraceURL != "" {
+			dr.Mount("/zpages", zpages.Mux(prefix+"/zpages", tracezProcessor, func(traceID string) string {
+				return strings.ReplaceAll(cfg.Debug.TraceURL, "{trace_id}", traceID)
+			}))
+		} else {
+			dr.Mount("/zpages", zpages.Mux(prefix+"/zpages", tracezProcessor, nil))
+		}
 	}
 
 	if pt, ok := l.StatsTracker().(*prom.Tracker); ok {
@@ -80,5 +87,5 @@ func (l *BaseLocator) SetupDebugRouter() {
 	dr.Mount("/docs", swg.NewHandler(l.OpenAPI.Reflector().SpecEns().Info.Title,
 		prefix+"/docs/openapi.json", prefix+"/docs"))
 
-	l.DebugRouter = dr
+	return dr
 }

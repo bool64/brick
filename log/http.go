@@ -11,18 +11,25 @@ import (
 	"github.com/bool64/ctxd"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/swaggest/rest"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // HTTPTraceTransaction adds trace transaction info to request context.
 func HTTPTraceTransaction(fields ctxd.FieldNames) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if span := trace.FromContext(r.Context()); span != nil {
+			span := trace.SpanFromContext(r.Context())
+			if span != nil {
 				sc := span.SpanContext()
+				if !sc.IsValid() {
+					h.ServeHTTP(w, r)
+
+					return
+				}
+
 				ctx := ctxd.AddFields(r.Context(),
-					fields.TraceID, sc.TraceID.String(),
-					fields.TransactionID, sc.SpanID.String(),
+					fields.TraceID, sc.TraceID().String(),
+					fields.TransactionID, sc.SpanID().String(),
 				)
 				r = r.WithContext(ctx)
 			}

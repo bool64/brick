@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/bool64/brick/debug"
+	"github.com/bool64/brick/telemetry"
 	"github.com/bool64/zapctxd"
 )
 
@@ -28,6 +29,9 @@ type BaseConfig struct {
 
 	// Debug controls dev tools.
 	Debug debug.Config `split_words:"true"`
+
+	// Telemetry configures OpenTelemetry export.
+	Telemetry telemetry.Config `split_words:"true"`
 
 	// CacheTransferURL is URL to fetch cache from on application start.
 	CacheTransferURL string `split_words:"true"`
