@@ -5,15 +5,15 @@ go 1.25.0
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/XSAM/otelsql v0.42.0
-	github.com/bool64/cache v0.4.8
+	github.com/bool64/cache v0.5.0
 	github.com/bool64/ctxd v1.2.1
 	github.com/bool64/dbwrap v0.1.4
-	github.com/bool64/dev v0.2.39
+	github.com/bool64/dev v0.2.45
 	github.com/bool64/godogx v0.1.1
 	github.com/bool64/httpmock v0.1.15
 	github.com/bool64/logz v1.3.2
 	github.com/bool64/prom-stats v0.1.3
-	github.com/bool64/shared v0.1.5
+	github.com/bool64/shared v0.1.6
 	github.com/bool64/sqluct v0.2.4
 	github.com/bool64/stats v0.2.2
 	github.com/bool64/zapctxd v1.2.0
@@ -29,7 +29,7 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0
 	github.com/stretchr/testify v1.11.1
-	github.com/swaggest/assertjson v1.9.0
+	github.com/swaggest/assertjson v1.10.0
 	github.com/swaggest/jsonschema-go v0.3.73
 	github.com/swaggest/openapi-go v0.2.55
 	github.com/swaggest/rest v0.2.72
@@ -37,6 +37,7 @@ require (
 	github.com/swaggest/usecase v1.3.1
 	github.com/vearutop/gooselite v0.1.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.18.0
+	go.opentelemetry.io/contrib/bridges/prometheus v0.68.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0
 	go.opentelemetry.io/contrib/zpages v0.68.0
 	go.opentelemetry.io/otel v1.43.0
@@ -79,7 +80,7 @@ require (
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
-	github.com/sergi/go-diff v1.3.1 // indirect
+	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
 	github.com/swaggest/refl v1.3.0 // indirect
@@ -87,10 +88,8 @@ require (
 	github.com/vearutop/lograte v1.2.0 // indirect
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0 // indirect
 	github.com/yosuke-furukawa/json5 v0.1.2-0.20201207051438-cf7bb3f354ff // indirect
-	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/contrib/bridges/prometheus v0.68.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.43.0 // indirect
 	go.opentelemetry.io/otel/log v0.19.0 // indirect
 	go.opentelemetry.io/otel/metric v1.43.0 // indirect
