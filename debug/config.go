@@ -8,7 +8,7 @@ import (
 
 // Config keeps debug settings.
 type Config struct {
-	// TraceSamplingProbability is probability of exporting of OpenCensus trace.
+	// TraceSamplingProbability is probability of sampling OpenTelemetry traces.
 	TraceSamplingProbability float64 `split_words:"true" default:"0.1"`
 
 	// TraceURL allows providing URL to {trace_id}, example http://jaeger.myservice.com/trace/{trace_id}.
@@ -27,7 +27,7 @@ type Config struct {
 	// can be useful for non-production environments.
 	ExposePanic bool `split_words:"true"`
 
-	OnPanic []func(ctx context.Context, rcv interface{}, stack []byte) `json:"-" ignored:"true"`
+	OnPanic []func(ctx context.Context, rcv any, stack []byte) `json:"-" ignored:"true"`
 
 	Middlewares chi.Middlewares `envconfig:"-" json:"-"`
 }

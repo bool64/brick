@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/XSAM/otelsql"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/sqluct"
 	"github.com/bool64/stats"
@@ -20,10 +21,9 @@ import (
 
 // SetupStorage initializes database pool and prepares storage.
 func SetupStorage(cfg Config, logger ctxd.Logger, statsTracker stats.Tracker, conn driver.Connector, migrations fs.FS) (*sqluct.Storage, error) {
-	conn = withTracing(conn)
 	conn = withQueriesLogging(cfg, conn, logger, statsTracker)
 
-	db := sql.OpenDB(conn)
+	db := otelsql.OpenDB(conn, tracingOptions()...)
 
 	return setupStorage(cfg, db, migrations, logger)
 }
@@ -53,6 +53,11 @@ func setupStorage(cfg Config, db *sql.DB, migrations fs.FS, logger ctxd.Logger) 
 	db.SetMaxOpenConns(cfg.MaxOpen)
 	db.SetConnMaxLifetime(cfg.MaxLifetime)
 
+	// Export database/sql pool stats alongside query traces and operation metrics.
+	if _, err := otelsql.RegisterDBStatsMetrics(db, tracingOptions()...); err != nil {
+		return nil, fmt.Errorf("register db stats metrics: %w", err)
+	}
+
 	st := sqluct.NewStorage(sqlx.NewDb(db, cfg.DriverName))
 	st.Mapper = &sqluct.Mapper{}
 	dialect := cfg.DriverName
@@ -74,7 +79,7 @@ func setupStorage(cfg Config, db *sql.DB, migrations fs.FS, logger ctxd.Logger) 
 	}
 
 	if cfg.InitConn {
-		if err := db.Ping(); err != nil {
+		if err := db.PingContext(context.Background()); err != nil {
 			return nil, fmt.Errorf("ping database: %w", err)
 		}
 	}
@@ -103,16 +108,16 @@ type gooseLogger struct {
 	l ctxd.Logger
 }
 
-func (l gooseLogger) Fatal(v ...interface{}) { l.l.Error(l.c, fmt.Sprint(v...)); os.Exit(1) }
-func (l gooseLogger) Fatalf(f string, v ...interface{}) {
+func (l gooseLogger) Fatal(v ...any) { l.l.Error(l.c, fmt.Sprint(v...)); os.Exit(1) }
+func (l gooseLogger) Fatalf(f string, v ...any) {
 	l.l.Error(l.c, fmt.Sprintf(f, v...))
 	os.Exit(1)
 }
 
-func (l gooseLogger) Print(v ...interface{}) {
+func (l gooseLogger) Print(v ...any) {
 	l.l.Info(l.c, strings.TrimRight(fmt.Sprint(v...), "\n"))
 }
-func (l gooseLogger) Println(v ...interface{}) { l.l.Info(l.c, fmt.Sprint(v...)) }
-func (l gooseLogger) Printf(f string, v ...interface{}) {
+func (l gooseLogger) Println(v ...any) { l.l.Info(l.c, fmt.Sprint(v...)) }
+func (l gooseLogger) Printf(f string, v ...any) {
 	l.l.Info(l.c, strings.TrimRight(fmt.Sprintf(f, v...), "\n"))
 }

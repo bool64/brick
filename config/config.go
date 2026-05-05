@@ -71,7 +71,7 @@ func DefaultLoaders(prefix string) []func() error {
 //
 // In no loaders are provided then vars from .env.template, .env, .env.<ENVIRONMENT>
 // files are loaded if available. Use nil or any other source to avoid that.
-func Load(prefix string, spec interface{}, loaders ...func() error) error {
+func Load(prefix string, spec any, loaders ...func() error) error {
 	if len(loaders) == 0 {
 		loaders = DefaultLoaders(prefix)
 	}
@@ -94,7 +94,7 @@ func Load(prefix string, spec interface{}, loaders ...func() error) error {
 	return validate(spec)
 }
 
-func validate(spec interface{}) error {
+func validate(spec any) error {
 	specj, err := json.Marshal(spec)
 	if err != nil {
 		return fmt.Errorf("json marshal: %w", err)

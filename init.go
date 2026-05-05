@@ -1,13 +1,9 @@
 package brick
 
 import (
-	"time"
-
-	ocprom "contrib.go.opencensus.io/exporter/prometheus"
-	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/bool64/brick/graceful"
 	"github.com/bool64/brick/log"
-	"github.com/bool64/brick/opencensus"
+	"github.com/bool64/brick/telemetry"
 	ucase "github.com/bool64/brick/usecase"
 	"github.com/bool64/cache"
 	"github.com/bool64/ctxd"
@@ -24,8 +20,6 @@ import (
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/web"
 	"github.com/swaggest/usecase"
-	"go.opencensus.io/stats/view"
-	"go.opencensus.io/trace"
 )
 
 // NoOpLocator creates a dummy service locator, suitable to docs rendering.
@@ -70,21 +64,20 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 
 	l.Switch = graceful.NewSwitch(cfg.ShutdownTimeout)
 
-	l.LoggerProvider = ctxz.NewObserver(zapctxd.New(cfg.Log).SkipCaller(), logz.Config{
+	tel, err := setupTelemetry(l)
+	if err != nil {
+		return l, err
+	}
+
+	l.LoggerProvider = ctxz.NewObserver(zapctxd.New(cfg.Log, tel.LoggerOptions...).SkipCaller(), logz.Config{
 		MaxCardinality: 100,
 		MaxSamples:     50,
 	})
 
 	l.UseCaseMiddlewares = []usecase.Middleware{
-		opencensus.UseCaseMiddleware{},
+		telemetry.UseCaseMiddleware{},
 		ucase.StatsMiddleware(l.StatsTracker()),
 		log.UsecaseErrors(l.CtxdLogger()),
-	}
-
-	if cfg.Debug.TraceSamplingProbability > 0 {
-		trace.ApplyConfig(trace.Config{
-			DefaultSampler: trace.ProbabilitySampler(cfg.Debug.TraceSamplingProbability),
-		})
 	}
 
 	l.HTTPRecoveryMiddleware = log.HTTPRecover{ // Panic recovery and request logging.
@@ -99,7 +92,7 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 	})
 
 	l.HTTPServerMiddlewares = append(l.HTTPServerMiddlewares,
-		opencensus.Middleware, // Tracing.
+		telemetry.Middleware, // Tracing and metrics.
 		log.HTTPTraceTransaction(l.BaseConfig.Log.FieldNames), // Trace transaction.
 		nethttp.UseCaseMiddlewares(l.UseCaseMiddlewares...),   // Use case middlewares.
 	)
@@ -114,7 +107,19 @@ func NewBaseLocator(cfg BaseConfig) (*BaseLocator, error) {
 		return l, err
 	}
 
+	l.DebugRouter = newDebugRouter(l, tel.TracezProcessor)
+
 	return l, nil
+}
+
+func setupTelemetry(l *BaseLocator) (telemetry.SetupResult, error) {
+	return telemetry.Setup(telemetry.SetupParams{
+		ServiceName:         l.BaseConfig.ServiceName,
+		Environment:         l.BaseConfig.Environment,
+		SamplingProbability: l.BaseConfig.Debug.TraceSamplingProbability,
+		Config:              l.BaseConfig.Telemetry,
+		OnShutdown:          l.OnShutdown,
+	})
 }
 
 func setupPrometheus(l *BaseLocator) error {
@@ -128,31 +133,13 @@ func setupPrometheus(l *BaseLocator) error {
 		return err
 	}
 
-	if err := view.Register(opencensus.Views()...); err != nil {
+	if err := telemetry.SetupMetrics(telemetry.MetricsParams{
+		Config:     l.BaseConfig.Telemetry,
+		Gatherer:   promReg,
+		OnShutdown: l.OnShutdown,
+	}); err != nil {
 		return err
 	}
-
-	if err := view.Register(ocsql.DefaultViews...); err != nil {
-		return err
-	}
-
-	// Initialize opencensus prometheus exporter.
-	promExporter, err := ocprom.NewExporter(ocprom.Options{
-		Registry: promReg,
-	})
-	if err != nil {
-		return err
-	}
-
-	view.RegisterExporter(promExporter)
-
-	l.OnShutdown("unregister_oc_prom", func() {
-		view.Unregister(opencensus.Views()...)
-		view.Unregister(ocsql.DefaultViews...)
-		view.UnregisterExporter(promExporter)
-	})
-
-	view.SetReportingPeriod(time.Second)
 
 	pt, err := prom.NewStatsTracker(promReg)
 	if err != nil {

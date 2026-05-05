@@ -53,7 +53,7 @@ func newContext(t *testing.T) *Context {
 	tc.External.VS = vs
 
 	tc.Database = dbsteps.NewManager()
-	tc.Database.Vars = vs.JSONComparer.Vars
+	tc.Database.VS.JSONComparer.Vars = vs.JSONComparer.Vars
 
 	tc.VS = vs
 	tc.Vars = vs.JSONComparer.Vars
@@ -75,6 +75,18 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 
 	tc := newContext(t)
 	l, router := init(tc)
+	requireFeatureServer(t, tc, l, router)
+
+	suite := featureSuite(t, cfg, tc)
+	configureFeatureFormatters(&suite)
+
+	assert.Equal(t, 0, suite.Run(), "non-zero status returned, failed to run feature tests")
+	shutdownFeatureServer(l)
+	<-l.Wait()
+}
+
+func requireFeatureServer(t *testing.T, tc *Context, l *brick.BaseLocator, router http.Handler) {
+	t.Helper()
 
 	addr, err := l.StartHTTPServer(router)
 	require.NoError(t, err)
@@ -84,6 +96,10 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 	dbi := tc.Database.Instances[dbsteps.Default]
 	dbi.Storage = l.Storage
 	tc.Database.Instances[dbsteps.Default] = dbi
+}
+
+func featureSuite(t *testing.T, cfg brick.WithBaseConfig, tc *Context) godog.TestSuite {
+	t.Helper()
 
 	godogx.RegisterPrettyFailedFormatter()
 
@@ -101,7 +117,7 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 		tc.OptionsInitializer(&options)
 	}
 
-	suite := godog.TestSuite{
+	return godog.TestSuite{
 		Name: cfg.Base().ServiceName + "-integration-test",
 		ScenarioInitializer: func(s *godog.ScenarioContext) {
 			tc.Local.RegisterSteps(s)
@@ -115,21 +131,21 @@ func RunFeatures(t *testing.T, envPrefix string, cfg brick.WithBaseConfig, init 
 		},
 		Options: &options,
 	}
+}
 
+func configureFeatureFormatters(suite *godog.TestSuite) {
 	if os.Getenv("GODOG_ALLURE") != "" {
 		allure.RegisterFormatter()
 
 		suite.Options.Format += ",allure"
 	}
+}
 
-	assert.Equal(t, 0, suite.Run(), "non-zero status returned, failed to run feature tests")
-
+func shutdownFeatureServer(l *brick.BaseLocator) {
 	// An instance can keep on running if developer would like to use or debug it after tests have finished.
 	if os.Getenv("GODOG_KEEP_INSTANCE") == "1" {
 		println("tests passed, keeping instance, kill it manually at will")
 	} else {
 		l.Shutdown()
 	}
-
-	<-l.Wait()
 }

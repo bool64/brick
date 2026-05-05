@@ -3,6 +3,7 @@ package log
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"runtime/debug"
 	"strings"
@@ -11,18 +12,25 @@ import (
 	"github.com/bool64/ctxd"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/swaggest/rest"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // HTTPTraceTransaction adds trace transaction info to request context.
 func HTTPTraceTransaction(fields ctxd.FieldNames) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if span := trace.FromContext(r.Context()); span != nil {
+			span := trace.SpanFromContext(r.Context())
+			if span != nil {
 				sc := span.SpanContext()
+				if !sc.IsValid() {
+					h.ServeHTTP(w, r)
+
+					return
+				}
+
 				ctx := ctxd.AddFields(r.Context(),
-					fields.TraceID, sc.TraceID.String(),
-					fields.TransactionID, sc.SpanID.String(),
+					fields.TraceID, sc.TraceID().String(),
+					fields.TransactionID, sc.SpanID().String(),
 				)
 				r = r.WithContext(ctx)
 			}
@@ -53,10 +61,10 @@ type HTTPRecover struct {
 	FieldNames  ctxd.FieldNames
 	PrintPanic  bool
 	ExposePanic bool
-	OnPanic     []func(ctx context.Context, rcv interface{}, stack []byte)
+	OnPanic     []func(ctx context.Context, rcv any, stack []byte)
 }
 
-func (mw HTTPRecover) handlePanic(ctx context.Context, rvr interface{}, msg string) {
+func (mw HTTPRecover) handlePanic(ctx context.Context, rvr any, msg string) {
 	if !mw.PrintPanic {
 		mw.Logger.Error(ctx, msg,
 			"panic", rvr,
@@ -67,7 +75,7 @@ func (mw HTTPRecover) handlePanic(ctx context.Context, rvr interface{}, msg stri
 	}
 }
 
-func (mw HTTPRecover) processPanic(ctx context.Context, rvr interface{}, rw http.ResponseWriter) {
+func (mw HTTPRecover) processPanic(ctx context.Context, rvr any, rw http.ResponseWriter) {
 	mw.handlePanic(ctx, rvr, "request panicked")
 
 	resp := rest.ErrResponse{ErrorText: "request panicked"}
@@ -77,7 +85,7 @@ func (mw HTTPRecover) processPanic(ctx context.Context, rvr interface{}, rw http
 	if mw.ExposePanic {
 		stack = debug.Stack()
 
-		resp.Context = map[string]interface{}{
+		resp.Context = map[string]any{
 			"panic": rvr, "stack": strings.Split(string(stack), "\n"),
 		}
 	}
@@ -116,8 +124,11 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 			defer func() {
 				rvr := recover()
 
-				//nolint:errorlint,goerr113 // Panic with sentinel error is not wrapped.
-				if rvr == nil || rvr == http.ErrAbortHandler {
+				if rvr == nil {
+					return
+				}
+
+				if err, ok := rvr.(error); ok && errors.Is(err, http.ErrAbortHandler) {
 					return
 				}
 
@@ -155,7 +166,7 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 }
 
 func headersMap(header http.Header) ctxd.DeferredJSON {
-	return func() interface{} {
+	return func() any {
 		headers := make(map[string]string, len(header))
 
 		for k := range header {

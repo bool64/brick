@@ -1,20 +1,16 @@
-package opencensus
+package telemetry
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/swaggest/usecase"
-	"github.com/swaggest/usecase/status"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
 
-type errorWithStatus interface {
-	Status() status.Code
-}
-
-// UseCaseMiddleware is a tracing usecase middleware.
+// UseCaseMiddleware is a tracing use case middleware.
 type UseCaseMiddleware struct {
 	WithInput bool
 }
@@ -37,27 +33,18 @@ func (mw UseCaseMiddleware) Wrap(u usecase.Interactor) usecase.Interactor {
 		spanName = "useCaseUnknown"
 	}
 
-	return usecase.Interact(func(ctx context.Context, input, output interface{}) error {
-		ctx, span := trace.StartSpan(ctx, spanName)
+	return usecase.Interact(func(ctx context.Context, input, output any) error {
+		ctx, span := otel.Tracer("github.com/bool64/brick/telemetry").Start(ctx, spanName)
 		if mw.WithInput {
-			span.AddAttributes(trace.StringAttribute("input", fmt.Sprintf("%v", input)))
+			span.SetAttributes(attribute.String("input", fmt.Sprintf("%v", input)))
 		}
 
 		defer span.End()
 
 		err := u.Interact(ctx, input, output)
 		if err != nil {
-			st := status.Unknown
-
-			var ws errorWithStatus
-			if errors.As(err, &ws) {
-				st = ws.Status()
-			}
-
-			span.SetStatus(trace.Status{
-				Code:    int32(st),
-				Message: err.Error(),
-			})
+			span.SetStatus(codes.Error, err.Error())
+			span.RecordError(err)
 		}
 
 		return err

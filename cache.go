@@ -36,7 +36,7 @@ func MakeCacheOf[V any](l interface {
 	}
 
 	if cfg.Backend == nil {
-		cfg.Backend = cache.NewShardedMapOf[V](func(cfg *cache.Config) {
+		cfg.Backend = cache.NewShardedMapOf[V](func(cfg *cache.ConfigOf[V]) {
 			cfg.Name = name
 			cfg.Logger = l.CtxdLogger()
 			cfg.Stats = l.StatsTracker()
@@ -45,6 +45,53 @@ func MakeCacheOf[V any](l interface {
 	}
 
 	fc := cache.NewFailoverOf[V](func(c *cache.FailoverConfigOf[V]) {
+		*c = cfg
+	})
+
+	if l, ok := l.(interface {
+		CacheTransfer() *cache.HTTPTransfer
+	}); ok {
+		if w, ok := cfg.Backend.(cache.WalkDumpRestorer); ok {
+			l.CacheTransfer().AddCache(name, w)
+		}
+	}
+
+	if l, ok := l.(interface {
+		CacheInvalidationIndex() *cache.InvalidationIndex
+	}); ok {
+		if d, ok := cfg.Backend.(cache.Deleter); ok {
+			l.CacheInvalidationIndex().AddCache(name, d)
+		}
+	}
+
+	return fc
+}
+
+// MakeCacheBy creates an instance of failover cache and adds it to cache transfer.
+func MakeCacheBy[K comparable, V any](l interface {
+	StatsTracker() stats.Tracker
+	CtxdLogger() ctxd.Logger
+}, name string, ttl time.Duration, options ...func(cfg *cache.FailoverConfigBy[K, V]),
+) *cache.FailoverBy[K, V] {
+	cfg := cache.FailoverConfigBy[K, V]{}
+	cfg.Name = name
+	cfg.Stats = l.StatsTracker()
+	cfg.Logger = l.CtxdLogger()
+
+	for _, option := range options {
+		option(&cfg)
+	}
+
+	if cfg.Backend == nil {
+		cfg.Backend = cache.NewShardedMapBy[K, V](func(cfg *cache.ConfigBy[K, V]) {
+			cfg.Name = name
+			cfg.Logger = l.CtxdLogger()
+			cfg.Stats = l.StatsTracker()
+			cfg.TimeToLive = ttl
+		})
+	}
+
+	fc := cache.NewFailoverBy[K, V](func(c *cache.FailoverConfigBy[K, V]) {
 		*c = cfg
 	})
 

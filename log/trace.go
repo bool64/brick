@@ -4,26 +4,32 @@ import (
 	"context"
 
 	"github.com/bool64/ctxd"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/embedded"
 )
 
 type tracerWithLog struct {
+	embedded.Tracer
 	field string
-	trace.Tracer
+	next  trace.Tracer
 }
 
-func (t *tracerWithLog) NewContext(parent context.Context, s *trace.Span) context.Context {
-	ctx := t.Tracer.NewContext(parent, s)
-	sc := s.SpanContext()
+func (t *tracerWithLog) Start(ctx context.Context, spanName string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
+	ctx, span := t.next.Start(ctx, spanName, opts...)
+	sc := span.SpanContext()
 
-	return ctxd.SetFields(ctx, t.field, sc.SpanID)
+	if !sc.IsValid() {
+		return ctx, span
+	}
+
+	return ctxd.SetFields(ctx, t.field, sc.SpanID().String()), span
 }
 
-// SpanIDFieldToContexts instruments trace.Tracer to add SpanID to context fields.
+// SpanIDFieldToContexts instruments trace.Tracer to add span ID to context fields.
 func SpanIDFieldToContexts(fieldName string, tracer trace.Tracer) trace.Tracer {
 	if _, ok := tracer.(*tracerWithLog); ok {
 		return tracer
 	}
 
-	return &tracerWithLog{Tracer: tracer, field: fieldName}
+	return &tracerWithLog{next: tracer, field: fieldName}
 }

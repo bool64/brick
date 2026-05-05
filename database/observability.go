@@ -7,30 +7,25 @@ import (
 	"fmt"
 	"time"
 
-	"contrib.go.opencensus.io/integrations/ocsql"
+	"github.com/XSAM/otelsql"
 	"github.com/bool64/ctxd"
 	"github.com/bool64/dbwrap"
 	"github.com/bool64/stats"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
 
-// withTracing instruments database connector with OpenCensus tracing.
-func withTracing(dbConnector driver.Connector) driver.Connector {
-	return ocsql.WrapConnector(dbConnector, tracingOptions()...)
-}
-
-// driverNameWithTracing registers database driver name with OpenCensus tracing.
+// driverNameWithTracing registers database driver name with OpenTelemetry instrumentation.
 func driverNameWithTracing(driverName string) (string, error) {
-	return ocsql.Register(driverName, tracingOptions()...)
+	return otelsql.Register(driverName, tracingOptions()...)
 }
 
-func tracingOptions() []ocsql.TraceOption {
-	return []ocsql.TraceOption{
-		ocsql.WithQuery(true),
-		ocsql.WithRowsClose(true),
-		ocsql.WithRowsAffected(true),
-		ocsql.WithAllowRoot(true),
-		ocsql.WithDisableErrSkip(true),
+func tracingOptions() []otelsql.Option {
+	return []otelsql.Option{
+		otelsql.WithTracerProvider(otel.GetTracerProvider()),
+		otelsql.WithMeterProvider(otel.GetMeterProvider()),
+		otelsql.WithDisableSkipErrMeasurement(true),
 	}
 }
 
@@ -93,10 +88,10 @@ func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []stri
 			return nil, nil
 		}
 
-		ctx, span := trace.StartSpan(ctx, caller+":"+string(operation))
-		span.AddAttributes(
-			trace.StringAttribute("stmt", statement),
-			trace.StringAttribute("args", fmt.Sprintf("%v", args)),
+		ctx, span := otel.Tracer("github.com/bool64/brick/database").Start(ctx, caller+":"+string(operation))
+		span.SetAttributes(
+			attribute.String("db.statement", statement),
+			attribute.String("db.args", fmt.Sprintf("%v", args)),
 		)
 
 		statsTracker.Add(ctx, "sql_storage_queries_total", 1, "method", caller)
@@ -114,7 +109,8 @@ func observe(logger ctxd.Logger, statsTracker stats.Tracker, skipPackages []stri
 			res := " complete"
 
 			if err != nil {
-				span.SetStatus(trace.Status{Message: err.Error()})
+				span.SetStatus(codes.Error, err.Error())
+				span.RecordError(err)
 
 				res = " failed"
 			}
