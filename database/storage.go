@@ -79,7 +79,7 @@ func setupStorage(cfg Config, db *sql.DB, migrations fs.FS, logger ctxd.Logger) 
 	}
 
 	if cfg.InitConn {
-		if err := db.Ping(); err != nil {
+		if err := db.PingContext(context.Background()); err != nil {
 			return nil, fmt.Errorf("ping database: %w", err)
 		}
 	}
@@ -108,16 +108,16 @@ type gooseLogger struct {
 	l ctxd.Logger
 }
 
-func (l gooseLogger) Fatal(v ...interface{}) { l.l.Error(l.c, fmt.Sprint(v...)); os.Exit(1) }
-func (l gooseLogger) Fatalf(f string, v ...interface{}) {
+func (l gooseLogger) Fatal(v ...any) { l.l.Error(l.c, fmt.Sprint(v...)); os.Exit(1) }
+func (l gooseLogger) Fatalf(f string, v ...any) {
 	l.l.Error(l.c, fmt.Sprintf(f, v...))
 	os.Exit(1)
 }
 
-func (l gooseLogger) Print(v ...interface{}) {
+func (l gooseLogger) Print(v ...any) {
 	l.l.Info(l.c, strings.TrimRight(fmt.Sprint(v...), "\n"))
 }
-func (l gooseLogger) Println(v ...interface{}) { l.l.Info(l.c, fmt.Sprint(v...)) }
-func (l gooseLogger) Printf(f string, v ...interface{}) {
+func (l gooseLogger) Println(v ...any) { l.l.Info(l.c, fmt.Sprint(v...)) }
+func (l gooseLogger) Printf(f string, v ...any) {
 	l.l.Info(l.c, strings.TrimRight(fmt.Sprintf(f, v...), "\n"))
 }

@@ -64,7 +64,7 @@ func (l *BaseLocator) StartHTTPServer(handler http.Handler) (string, error) {
 		cfg.HTTPListenAddr = "127.0.0.1:0"
 	}
 
-	listener, err := net.Listen("tcp", cfg.HTTPListenAddr)
+	listener, err := new(net.ListenConfig).Listen(context.Background(), "tcp", cfg.HTTPListenAddr)
 	if err != nil {
 		return "", fmt.Errorf("failed to start http server: %w", err)
 	}

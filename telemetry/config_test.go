@@ -1,13 +1,14 @@
-package telemetry
+package telemetry_test
 
 import (
 	"testing"
 
+	"github.com/bool64/brick/telemetry"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig_GrafanaStyleDefaults(t *testing.T) {
-	cfg := Config{
+	cfg := telemetry.Config{
 		BaseURL:  "https://otlp-gateway-prod-eu-west-2.grafana.net/otlp",
 		Username: "12345",
 		Password: "glc_abcdef",

@@ -19,6 +19,8 @@ import (
 //		attribute.String("key", "value"),
 //	)
 //	defer finish(&err)
+//
+//nolint:spancheck // The returned callback owns span.End and must be deferred by the caller.
 func AddSpan(ctx context.Context, attributes ...attribute.KeyValue) (context.Context, func(*error)) {
 	ctx, span := otel.Tracer("github.com/bool64/brick/telemetry").Start(ctx, runtime.CallerFunc(2))
 	span.SetAttributes(attributes...)

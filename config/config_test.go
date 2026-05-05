@@ -1,20 +1,14 @@
 package config_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/bool64/brick/config"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestLoad(t *testing.T) {
-	require.NoError(t, os.Chdir("./__testdata"))
-
-	defer func() {
-		require.NoError(t, os.Chdir(".."))
-	}()
+	t.Chdir("./__testdata")
 
 	cfg := struct {
 		Foo string

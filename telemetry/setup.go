@@ -72,7 +72,7 @@ func Setup(p SetupParams) (SetupResult, error) {
 
 	if p.OnShutdown != nil {
 		p.OnShutdown("otel_tracer_provider", func() {
-			_ = tracerProvider.Shutdown(context.Background())
+			logShutdownError("otel tracer provider", tracerProvider.Shutdown(context.Background()))
 		})
 	}
 
@@ -136,7 +136,7 @@ func setupLogs(serviceName string, cfg Config, res *resource.Resource, onShutdow
 
 	if onShutdown != nil {
 		onShutdown("otel_log_provider", func() {
-			_ = loggerProvider.Shutdown(context.Background())
+			logShutdownError("otel log provider", loggerProvider.Shutdown(context.Background()))
 		})
 	}
 
@@ -152,5 +152,11 @@ func loggerOptions(logHandler slog.Handler) []zap.Option {
 		zap.WrapCore(func(core zapcore.Core) zapcore.Core {
 			return zapcore.NewTee(core, NewZapCore(logHandler, zap.DebugLevel))
 		}),
+	}
+}
+
+func logShutdownError(name string, err error) {
+	if err != nil {
+		slog.Default().Error("telemetry shutdown failed", "component", name, "error", err)
 	}
 }

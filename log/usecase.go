@@ -33,7 +33,7 @@ func UsecaseErrors(logger ctxd.Logger) usecase.Middleware {
 			name = "unnamed" + strconv.Itoa(unknownIndex)
 		}
 
-		return usecase.Interact(func(ctx context.Context, input, output interface{}) error {
+		return usecase.Interact(func(ctx context.Context, input, output any) error {
 			err := u.Interact(ctx, input, output)
 			if err != nil {
 				logger.Error(ctx, "usecase failed", "error", err, "name", name)

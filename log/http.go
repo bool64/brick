@@ -3,6 +3,7 @@ package log
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"runtime/debug"
 	"strings"
@@ -60,10 +61,10 @@ type HTTPRecover struct {
 	FieldNames  ctxd.FieldNames
 	PrintPanic  bool
 	ExposePanic bool
-	OnPanic     []func(ctx context.Context, rcv interface{}, stack []byte)
+	OnPanic     []func(ctx context.Context, rcv any, stack []byte)
 }
 
-func (mw HTTPRecover) handlePanic(ctx context.Context, rvr interface{}, msg string) {
+func (mw HTTPRecover) handlePanic(ctx context.Context, rvr any, msg string) {
 	if !mw.PrintPanic {
 		mw.Logger.Error(ctx, msg,
 			"panic", rvr,
@@ -74,7 +75,7 @@ func (mw HTTPRecover) handlePanic(ctx context.Context, rvr interface{}, msg stri
 	}
 }
 
-func (mw HTTPRecover) processPanic(ctx context.Context, rvr interface{}, rw http.ResponseWriter) {
+func (mw HTTPRecover) processPanic(ctx context.Context, rvr any, rw http.ResponseWriter) {
 	mw.handlePanic(ctx, rvr, "request panicked")
 
 	resp := rest.ErrResponse{ErrorText: "request panicked"}
@@ -84,7 +85,7 @@ func (mw HTTPRecover) processPanic(ctx context.Context, rvr interface{}, rw http
 	if mw.ExposePanic {
 		stack = debug.Stack()
 
-		resp.Context = map[string]interface{}{
+		resp.Context = map[string]any{
 			"panic": rvr, "stack": strings.Split(string(stack), "\n"),
 		}
 	}
@@ -123,8 +124,11 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 			defer func() {
 				rvr := recover()
 
-				//nolint:errorlint,goerr113 // Panic with sentinel error is not wrapped.
-				if rvr == nil || rvr == http.ErrAbortHandler {
+				if rvr == nil {
+					return
+				}
+
+				if err, ok := rvr.(error); ok && errors.Is(err, http.ErrAbortHandler) {
 					return
 				}
 
@@ -162,7 +166,7 @@ func (mw HTTPRecover) Middleware() func(handler http.Handler) http.Handler {
 }
 
 func headersMap(header http.Header) ctxd.DeferredJSON {
-	return func() interface{} {
+	return func() any {
 		headers := make(map[string]string, len(header))
 
 		for k := range header {

@@ -3,6 +3,7 @@ package runtime
 import (
 	"path"
 	"runtime"
+	"slices"
 	"strings"
 )
 
@@ -38,17 +39,7 @@ func Ancestor(skipCallers, stackSize int, skipPackages ...string) string {
 		parts[len(parts)-1] = strings.Split(parts[len(parts)-1], ".")[0]
 		p = strings.Join(parts, "/")
 
-		skip := false
-
-		for _, sp := range skipPackages {
-			if p == sp {
-				skip = true
-
-				break
-			}
-		}
-
-		if skip {
+		if slices.Contains(skipPackages, p) {
 			continue
 		}
 

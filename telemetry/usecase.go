@@ -33,7 +33,7 @@ func (mw UseCaseMiddleware) Wrap(u usecase.Interactor) usecase.Interactor {
 		spanName = "useCaseUnknown"
 	}
 
-	return usecase.Interact(func(ctx context.Context, input, output interface{}) error {
+	return usecase.Interact(func(ctx context.Context, input, output any) error {
 		ctx, span := otel.Tracer("github.com/bool64/brick/telemetry").Start(ctx, spanName)
 		if mw.WithInput {
 			span.SetAttributes(attribute.String("input", fmt.Sprintf("%v", input)))

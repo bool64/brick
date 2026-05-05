@@ -31,5 +31,9 @@ func StableHeapInUse() int64 {
 		runtime.GC()
 	}
 
+	if m.HeapInuse > math.MaxInt64 {
+		return math.MaxInt64
+	}
+
 	return int64(m.HeapInuse)
 }

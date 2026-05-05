@@ -34,6 +34,7 @@ type Config struct {
 	MetricsInterval time.Duration `split_words:"true" default:"15s"`
 }
 
+// TraceEndpoint returns the OTLP traces endpoint URL.
 func (c Config) TraceEndpoint() string {
 	if c.TracesURL != "" {
 		return c.TracesURL
@@ -46,6 +47,7 @@ func (c Config) TraceEndpoint() string {
 	return strings.TrimRight(c.BaseURL, "/") + "/v1/traces"
 }
 
+// MetricEndpoint returns the OTLP metrics endpoint URL.
 func (c Config) MetricEndpoint() string {
 	if c.MetricsURL != "" {
 		return c.MetricsURL
@@ -58,6 +60,7 @@ func (c Config) MetricEndpoint() string {
 	return strings.TrimRight(c.BaseURL, "/") + "/v1/metrics"
 }
 
+// LogEndpoint returns the OTLP logs endpoint URL.
 func (c Config) LogEndpoint() string {
 	if c.LogsURL != "" {
 		return c.LogsURL
@@ -70,6 +73,7 @@ func (c Config) LogEndpoint() string {
 	return strings.TrimRight(c.BaseURL, "/") + "/v1/logs"
 }
 
+// AuthorizationHeader returns the Authorization header for OTLP requests.
 func (c Config) AuthorizationHeader() string {
 	if c.Authorization != "" {
 		return c.Authorization
@@ -82,6 +86,7 @@ func (c Config) AuthorizationHeader() string {
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(c.Username+":"+c.Password))
 }
 
+// Headers returns OTLP request headers derived from configuration.
 func (c Config) Headers() map[string]string {
 	auth := c.AuthorizationHeader()
 	if auth == "" {

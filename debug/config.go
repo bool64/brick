@@ -27,7 +27,7 @@ type Config struct {
 	// can be useful for non-production environments.
 	ExposePanic bool `split_words:"true"`
 
-	OnPanic []func(ctx context.Context, rcv interface{}, stack []byte) `json:"-" ignored:"true"`
+	OnPanic []func(ctx context.Context, rcv any, stack []byte) `json:"-" ignored:"true"`
 
 	Middlewares chi.Middlewares `envconfig:"-" json:"-"`
 }

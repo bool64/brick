@@ -56,7 +56,9 @@ func SetupMetrics(p MetricsParams) error {
 	prometheusGathererMu.Unlock()
 
 	readers := []metric.Option{metric.WithReader(promExporter)}
+
 	var producers []metric.Producer
+
 	if p.Gatherer != nil {
 		producers = append(producers, bridgeprom.NewMetricProducer(bridgeprom.WithGatherer(p.Gatherer)))
 	}
@@ -76,7 +78,7 @@ func SetupMetrics(p MetricsParams) error {
 			prometheusGatherer = nil
 			prometheusGathererMu.Unlock()
 
-			_ = meterProvider.Shutdown(context.Background())
+			logShutdownError("otel meter provider", meterProvider.Shutdown(context.Background()))
 		})
 	}
 
@@ -108,6 +110,7 @@ func NewMetricsReader(cfg Config, producers ...metric.Producer) (metric.Reader, 
 	}
 
 	readerOpts := []metric.PeriodicReaderOption{metric.WithInterval(interval)}
+
 	for _, producer := range producers {
 		if producer != nil {
 			readerOpts = append(readerOpts, metric.WithProducer(producer))
