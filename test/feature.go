@@ -53,7 +53,7 @@ func newContext(t *testing.T) *Context {
 	tc.External.VS = vs
 
 	tc.Database = dbsteps.NewManager()
-	tc.Database.Vars = vs.JSONComparer.Vars
+	tc.Database.VS.JSONComparer.Vars = vs.JSONComparer.Vars
 
 	tc.VS = vs
 	tc.Vars = vs.JSONComparer.Vars
