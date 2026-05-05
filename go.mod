@@ -14,15 +14,15 @@ require (
 	github.com/bool64/logz v1.3.2
 	github.com/bool64/prom-stats v0.1.3
 	github.com/bool64/shared v0.1.6
-	github.com/bool64/sqluct v0.2.4
+	github.com/bool64/sqluct v0.2.8
 	github.com/bool64/stats v0.2.2
 	github.com/bool64/zapctxd v1.2.0
-	github.com/cucumber/godog v0.15.0
+	github.com/cucumber/godog v0.15.1
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/godogx/allure v0.2.4
-	github.com/godogx/dbsteps v0.1.3
-	github.com/godogx/httpsteps v0.2.16
-	github.com/godogx/vars v0.1.8
+	github.com/godogx/dbsteps v0.1.9
+	github.com/godogx/httpsteps v0.2.19
+	github.com/godogx/vars v0.1.11
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -30,10 +30,10 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v3 v3.1.0
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggest/assertjson v1.10.0
-	github.com/swaggest/jsonschema-go v0.3.73
-	github.com/swaggest/openapi-go v0.2.55
-	github.com/swaggest/rest v0.2.72
-	github.com/swaggest/swgui v1.8.4
+	github.com/swaggest/jsonschema-go v0.3.79
+	github.com/swaggest/openapi-go v0.2.61
+	github.com/swaggest/rest v0.2.75
+	github.com/swaggest/swgui v1.8.7
 	github.com/swaggest/usecase v1.3.1
 	github.com/vearutop/gooselite v0.1.1
 	go.opentelemetry.io/contrib/bridges/otelslog v0.18.0
@@ -49,7 +49,7 @@ require (
 	go.opentelemetry.io/otel/sdk/log v0.19.0
 	go.opentelemetry.io/otel/sdk/metric v1.43.0
 	go.opentelemetry.io/otel/trace v1.43.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.28.0
 )
 
 require (
@@ -68,7 +68,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
-	github.com/hashicorp/go-memdb v1.3.4 // indirect
+	github.com/hashicorp/go-memdb v1.3.5 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/iancoleman/orderedmap v0.3.0 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
@@ -81,9 +81,9 @@ require (
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/swaggest/form/v5 v5.1.1 // indirect
-	github.com/swaggest/refl v1.3.0 // indirect
+	github.com/swaggest/refl v1.4.0 // indirect
 	github.com/vearutop/dynhist-go v1.2.3 // indirect
 	github.com/vearutop/lograte v1.2.0 // indirect
 	github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0 // indirect
